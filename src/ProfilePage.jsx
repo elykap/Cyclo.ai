@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 
 function ProfilePage({ user, onComplete, theme, toggleTheme }) {
+  const navigate = useNavigate()
   const [businessName, setBusinessName] = useState('')
   const [businessType, setBusinessType] = useState('')
   const [website, setWebsite] = useState('')
@@ -72,6 +74,7 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
       if (upsertError) throw upsertError
 
       if (onComplete) onComplete()
+      navigate('/overview')
     } catch (err) {
       console.error('Error saving profile:', err)
       setError(err.message || 'There was an error saving your profile. Try again.')
