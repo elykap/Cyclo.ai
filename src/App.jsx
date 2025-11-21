@@ -7,7 +7,14 @@ function App() {
   const [activeTab, setActiveTab] = useState('overview')
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState('landing')
+  const [currentPage, setCurrentPage] = useState(() => {
+    try {
+      const stored = localStorage.getItem('currentPage')
+      return stored || 'landing'
+    } catch (e) {
+      return 'landing'
+    }
+  })
   const [theme, setTheme] = useState(() => {
     // Check for saved theme preference first
     const savedTheme = localStorage.getItem('theme')
@@ -27,10 +34,11 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser)
       setLoading(false)
-      // If user is logged in, go to dashboard
-      if (currentUser) {
-        setCurrentPage('dashboard')
-      } else {
+      // Do NOT auto-redirect to dashboard on auth state change.
+      // Keep the user on the current page (e.g., landing) unless
+      // navigation is triggered explicitly by UI actions such as
+      // clicking "Get Started" or successful sign-in flow.
+      if (!currentUser) {
         setCurrentPage('landing')
       }
     })
@@ -42,6 +50,15 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('theme', theme)
   }, [theme])
+
+  // Persist current page so reloads restore the same page
+  useEffect(() => {
+    try {
+      localStorage.setItem('currentPage', currentPage)
+    } catch (e) {
+      // ignore write errors (e.g., private mode)
+    }
+  }, [currentPage])
 
   // Listen for system theme changes
   useEffect(() => {
