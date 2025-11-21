@@ -67,10 +67,9 @@ function LandingPage({ theme, toggleTheme, user }) {
       {/* Hero Section */}
       <section className="landing-hero">
         <div className="landing-hero-content">
-          <h2 className="landing-title">Streamline Your Business Operations</h2>
+          <h2 className="landing-title">Cyclo: data in, action out.</h2>
           <p className="landing-subtitle">
-            Cyclo is your all-in-one platform for inventory management, customer communication, 
-            and demographic forecasting. Make data-driven decisions and stay ahead of the curve.
+            Cyclo brings together a personalized Cyclo Bot, trend insights, upcoming events, and inventory tools—powered by your data and ready to act.
           </p>
           <button 
             className="get-started-button" 
@@ -115,17 +114,13 @@ function LandingPage({ theme, toggleTheme, user }) {
           <div className="feature-card feature-card-3">
             <div className="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-                <line x1="3" y1="21" x2="3" y2="15"></line>
-                <line x1="6" y1="21" x2="6" y2="12"></line>
-                <line x1="9" y1="21" x2="9" y2="18"></line>
+                <polyline points="4 14 9 9 13 13 20 6"></polyline>
+                <polyline points="14 6 20 6 20 12"></polyline>
               </svg>
             </div>
-            <h3 className="feature-title">Demographic Forecast</h3>
+            <h3 className="feature-title">Trend Insights</h3>
             <p className="feature-description">
-              Predict upcoming events and understand who will be in your area. 
-              Plan ahead with data-driven demographic insights.
+              See emerging trends at a glance with our Trend page—fresh insights distilled from your data.
             </p>
           </div>
         </div>
