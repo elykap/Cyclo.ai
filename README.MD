@@ -50,13 +50,17 @@ This starter uses the official [IBM watsonx.ai API](https://cloud.ibm.com/apidoc
    VITE_WATSONX_API_KEY=your_ibm_cloud_api_key_here
    VITE_WATSONX_PROJECT_ID=your_project_id_here
    VITE_WATSONX_SPACE_ID=your_space_id_here  # Optional
+   
+   # PredictHQ Events Intelligence API (Optional - for demographics/events features)
+   VITE_PREDICTHQ_API_TOKEN=your_predicthq_api_token_here
    ```
 
    **How to get your credentials:**
 
-   - **API Key**: Visit [IBM Cloud API Keys](https://cloud.ibm.com/iam/apikeys) and create a new API key
+   - **IBM Cloud API Key**: Visit [IBM Cloud API Keys](https://cloud.ibm.com/iam/apikeys) and create a new API key
    - **Project ID**: Found in your watsonx.ai project settings
    - **Space ID**: (Optional) Found in your deployment space settings
+   - **PredictHQ API Token**: Sign up at [PredictHQ](https://www.predicthq.com/) and get your API token from the dashboard (optional, for events/demographics features)
 
 4. **Start Vite + Proxy together**
    ```bash
@@ -75,8 +79,8 @@ Cyclo.ai/
 │   │   └── watsonx.config.js     # API configuration
 │   ├── services/
 │   │   └── watsonxServiceProxy.js # The shared LLM helper
-│   ├── App.jsx                    # Minimal landing page
-│   ├── App.css                    # Presentation styles
+│   ├── App.jsx                    # Main application component
+│   ├── index.css                  # Global styles
 │   └── main.jsx                   # Application entry point
 ├── server.js                      # Local proxy (IAM + CORS)
 ├── .env.example                   # Environment variables template

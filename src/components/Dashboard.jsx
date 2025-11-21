@@ -35,6 +35,7 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'messaging': return 'Messaging'
       case 'demographics': return 'Demographics'
       case 'settings': return 'Settings'
+      case 'predicthq-test': return 'PredictHQ API Test'
       default: return 'Dashboard'
     }
   }
@@ -46,6 +47,7 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'messaging': return 'Communicate with your customers.'
       case 'demographics': return 'View demographic forecasts and upcoming events.'
       case 'settings': return 'Configure your account and preferences.'
+      case 'predicthq-test': return 'Test the PredictHQ Events Intelligence API integration.'
       default: return ''
     }
   }
@@ -114,6 +116,16 @@ function Dashboard({ user, theme, toggleTheme }) {
               <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 18.364m12.728 0l-4.243-4.243m-4.242 0L5.636 5.636"></path>
             </svg>
             <span className="nav-label">Settings</span>
+          </Link>
+          <Link 
+            to="/predicthq-test"
+            className={`nav-item ${activeTab === 'predicthq-test' ? 'active' : ''}`}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span className="nav-label">PredictHQ Test</span>
           </Link>
         </nav>
       </aside>
