@@ -15,6 +15,8 @@ import { supabase } from './supabaseClient'
 function App() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [profileComplete, setProfileComplete] = useState(null)
+  const [profileLoading, setProfileLoading] = useState(false)
   const [theme, setTheme] = useState(() => {
     // Check for saved theme preference first
     const savedTheme = localStorage.getItem('theme')
@@ -39,6 +41,9 @@ function App() {
         if (session?.user && mounted) {
           setUser(session.user)
         }
+        if (!session?.user && mounted) {
+          setProfileComplete(null)
+        }
       } catch (err) {
         console.warn('Error getting supabase session', err)
       } finally {
@@ -52,6 +57,7 @@ function App() {
         setUser(session.user)
       } else {
         setUser(null)
+        setProfileComplete(null)
       }
     })
 
@@ -60,6 +66,43 @@ function App() {
       listener?.subscription?.unsubscribe?.()
     }
   }, [])
+
+  useEffect(() => {
+    let active = true
+    const fetchProfileStatus = async () => {
+      if (!user) {
+        setProfileComplete(null)
+        setProfileLoading(false)
+        return
+      }
+      setProfileLoading(true)
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('profile_complete')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (!active) return
+        if (error) {
+          console.warn('Error fetching profile', error)
+          setProfileComplete(false)
+        } else {
+          setProfileComplete(Boolean(data?.profile_complete))
+        }
+      } catch (err) {
+        if (active) {
+          console.warn('Unexpected error fetching profile', err)
+          setProfileComplete(false)
+        }
+      } finally {
+        if (active) setProfileLoading(false)
+      }
+    }
+    fetchProfileStatus()
+    return () => {
+      active = false
+    }
+  }, [user])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -110,7 +153,15 @@ function App() {
           path="/" 
           element={
             user ? (
-              <Navigate to="/overview" replace />
+              profileLoading ? (
+                <div className="loading-container">
+                  <div className="loading-spinner"></div>
+                </div>
+              ) : profileComplete ? (
+                <Navigate to="/overview" replace />
+              ) : (
+                <Navigate to="/profile" replace />
+              )
             ) : (
               <LandingPage 
                 theme={theme} 
@@ -126,11 +177,20 @@ function App() {
           path="/profile"
           element={
             <ProtectedRoute user={user} loading={loading}>
-              <ProfilePage 
-                user={user} 
-                theme={theme} 
-                toggleTheme={toggleTheme} 
-              />
+              {profileLoading ? (
+                <div className="loading-container">
+                  <div className="loading-spinner"></div>
+                </div>
+              ) : profileComplete ? (
+                <Navigate to="/overview" replace />
+              ) : (
+                <ProfilePage 
+                  user={user} 
+                  theme={theme} 
+                  toggleTheme={toggleTheme}
+                  onComplete={() => setProfileComplete(true)} 
+                />
+              )}
             </ProtectedRoute>
           }
         />
@@ -139,7 +199,15 @@ function App() {
         <Route
           element={
             <ProtectedRoute user={user} loading={loading}>
-              <Dashboard user={user} theme={theme} toggleTheme={toggleTheme} />
+              {profileLoading ? (
+                <div className="loading-container">
+                  <div className="loading-spinner"></div>
+                </div>
+              ) : profileComplete ? (
+                <Dashboard user={user} theme={theme} toggleTheme={toggleTheme} />
+              ) : (
+                <Navigate to="/profile" replace />
+              )}
             </ProtectedRoute>
           }
         >
