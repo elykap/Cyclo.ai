@@ -20,9 +20,10 @@ function PredictHQTest() {
   const [analyzing, setAnalyzing] = useState(false)
   const [summary, setSummary] = useState(null)
 
-  // Load categories on mount
+  // Load categories on mount (for future use) and fetch default events
   useEffect(() => {
     loadCategories()
+    handleSearch(true)
   }, [])
 
   const parseAnalysis = (analysisText, eventsData) => {
@@ -93,7 +94,7 @@ function PredictHQTest() {
     }
   }
 
-  const handleSearch = async () => {
+  const handleSearch = async (auto = false) => {
     setLoading(true)
     setError(null)
     setEvents([])
@@ -255,190 +256,7 @@ Provide your analysis in a clear, actionable format with specific recommendation
     <div className="section-content">
       <div className="content-card">
         <div className="card-header">
-          <h3>PredictHQ API Test</h3>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-            Test the PredictHQ Events Intelligence API integration
-          </p>
-        </div>
-
-        {/* Search Form */}
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-primary)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                Location (lat,lng or address)
-              </label>
-              <input
-                type="text"
-                value={searchParams.location}
-                onChange={(e) => setSearchParams({ ...searchParams, location: e.target.value })}
-                placeholder="42.3314,-83.0458 (Detroit, MI) or address"
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem'
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                Radius (km)
-              </label>
-              <input
-                type="number"
-                value={searchParams.radius}
-                onChange={(e) => setSearchParams({ ...searchParams, radius: parseInt(e.target.value) || 25 })}
-                min="1"
-                max="100"
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem'
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={searchParams.start}
-                onChange={(e) => setSearchParams({ ...searchParams, start: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem'
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                End Date
-              </label>
-              <input
-                type="date"
-                value={searchParams.end}
-                onChange={(e) => setSearchParams({ ...searchParams, end: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem'
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                Category
-              </label>
-              <select
-                value={searchParams.category}
-                onChange={(e) => setSearchParams({ ...searchParams, category: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  background: 'var(--bg-secondary)'
-                }}
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.label || cat.id}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                Limit
-              </label>
-              <input
-                type="number"
-                value={searchParams.limit}
-                onChange={(e) => setSearchParams({ ...searchParams, limit: parseInt(e.target.value) || 20 })}
-                min="1"
-                max="200"
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem'
-                }}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button
-              onClick={handleSearch}
-              disabled={loading}
-              style={{
-                padding: '0.75rem 1.5rem',
-                background: 'var(--bg-sidebar-active)',
-                color: 'var(--text-white)',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1
-              }}
-            >
-              {loading ? 'Searching...' : 'Search Events'}
-            </button>
-            <button
-              onClick={async () => {
-                setLoading(true)
-                setError(null)
-                setEvents([])
-                setStats(null)
-                try {
-                  // Simple test without location
-                  const response = await predicthqService.searchEvents({
-                    start: searchParams.start,
-                    end: searchParams.end,
-                    limit: 10
-                  })
-                  setEvents(response.results || [])
-                } catch (err) {
-                  setError(err.message || 'Test failed')
-                } finally {
-                  setLoading(false)
-                }
-              }}
-              disabled={loading}
-              style={{
-                padding: '0.75rem 1.5rem',
-                background: 'var(--bg-tertiary)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border-primary)',
-                borderRadius: '6px',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1
-              }}
-            >
-              Test (No Location)
-            </button>
-          </div>
+          <h3>Upcoming Events</h3>
         </div>
 
         {/* Error Message */}
@@ -472,35 +290,6 @@ Provide your analysis in a clear, actionable format with specific recommendation
                 <li>Restart dev server after changing <code>.env</code> file</li>
                 <li>Check PredictHQ API documentation: <a href="https://docs.predicthq.com/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>docs.predicthq.com</a></li>
               </ul>
-            </div>
-          </div>
-        )}
-
-        {/* Statistics */}
-        {stats && (
-          <div style={{
-            padding: '1rem 1.5rem',
-            background: 'var(--bg-tertiary)',
-            margin: '1rem 1.5rem',
-            borderRadius: '6px',
-            border: '1px solid var(--border-primary)'
-          }}>
-            <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem' }}>Event Statistics</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-              <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Total Events</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--text-primary)' }}>
-                  {stats.count || 0}
-                </div>
-              </div>
-              {stats.by_category && Object.keys(stats.by_category).length > 0 && (
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Categories</div>
-                  <div style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>
-                    {Object.keys(stats.by_category).length} categories
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -711,92 +500,6 @@ Provide your analysis in a clear, actionable format with specific recommendation
           </div>
         )}
 
-        {/* Events List - Show AFTER Summary */}
-        {events.length > 0 && (
-          <div style={{ padding: '1.5rem' }}>
-            <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>
-              Found {events.length} Events
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {events.map((event) => (
-                <div
-                  key={event.id}
-                  style={{
-                    padding: '1rem',
-                    border: '1px solid var(--border-primary)',
-                    borderRadius: '8px',
-                    background: 'var(--bg-card)'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                    <h5 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-primary)' }}>
-                      {event.title || 'Untitled Event'}
-                    </h5>
-                    {event.category && (
-                      <span style={{
-                        padding: '0.25rem 0.5rem',
-                        background: 'var(--bg-tertiary)',
-                        borderRadius: '4px',
-                        fontSize: '0.75rem',
-                        color: 'var(--text-secondary)'
-                      }}>
-                        {event.category}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {event.description && (
-                    <p style={{ margin: '0.5rem 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                      {event.description.substring(0, 200)}...
-                    </p>
-                  )}
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '0.75rem', fontSize: '0.875rem' }}>
-                    <div>
-                      <strong style={{ color: 'var(--text-secondary)' }}>Start:</strong>{' '}
-                      <span style={{ color: 'var(--text-primary)' }}>{formatDate(event.start)}</span>
-                    </div>
-                    {event.end && (
-                      <div>
-                        <strong style={{ color: 'var(--text-secondary)' }}>End:</strong>{' '}
-                        <span style={{ color: 'var(--text-primary)' }}>{formatDate(event.end)}</span>
-                      </div>
-                    )}
-                    <div>
-                      <strong style={{ color: 'var(--text-secondary)' }}>Location:</strong>{' '}
-                      <span style={{ color: 'var(--text-primary)' }}>{formatLocation(event.location)}</span>
-                    </div>
-                    {event.venue && (
-                      <div>
-                        <strong style={{ color: 'var(--text-secondary)' }}>Venue:</strong>{' '}
-                        <span style={{ color: 'var(--text-primary)' }}>{event.venue.name || 'N/A'}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {event.entities && event.entities.length > 0 && (
-                    <div style={{ marginTop: '0.75rem', fontSize: '0.875rem' }}>
-                      <strong style={{ color: 'var(--text-secondary)' }}>Entities:</strong>{' '}
-                      <span style={{ color: 'var(--text-primary)' }}>
-                        {event.entities.map(e => e.name || e.id).join(', ')}
-                      </span>
-                    </div>
-                  )}
-
-                  {event.phq_attendance && (
-                    <div style={{ marginTop: '0.75rem', padding: '0.5rem', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>
-                      <strong style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Predicted Attendance:</strong>{' '}
-                      <span style={{ color: 'var(--text-primary)', fontSize: '0.875rem' }}>
-                        {event.phq_attendance.low ? `${event.phq_attendance.low.toLocaleString()} - ${event.phq_attendance.high.toLocaleString()}` : 'N/A'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* No Results */}
         {!loading && events.length === 0 && !error && (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
@@ -809,4 +512,3 @@ Provide your analysis in a clear, actionable format with specific recommendation
 }
 
 export default PredictHQTest
-

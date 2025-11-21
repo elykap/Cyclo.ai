@@ -105,7 +105,7 @@ function LandingPage({ theme, toggleTheme, user }) {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
             </div>
-            <h3 className="feature-title">Customer Messaging</h3>
+            <h3 className="feature-title">Cyclo Bot</h3>
             <p className="feature-description">
               Chat with a personalized agent trained on your data to answer questions 
               and respond to customers automatically.
