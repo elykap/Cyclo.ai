@@ -7,8 +7,8 @@ function LandingPage({ theme, toggleTheme, user }) {
   const navigate = useNavigate()
 
   const handleAuthSuccess = () => {
-    // User is now logged in, navigate to dashboard
-    navigate('/overview')
+    // Always collect profile details after authentication
+    navigate('/profile')
   }
 
   const handleGetStarted = () => {
@@ -135,4 +135,3 @@ function LandingPage({ theme, toggleTheme, user }) {
 }
 
 export default LandingPage
-
