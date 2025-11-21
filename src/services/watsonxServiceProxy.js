@@ -51,7 +51,17 @@ class WatsonxServiceProxy {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || errorData.error || `API request failed: ${response.status}`);
+      let errorMessage = errorData.message || errorData.error || `API request failed: ${response.status}`;
+      
+      // Provide helpful error message for model not found
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        const modelError = errorData.errors.find(err => err.code === 'model_not_supported');
+        if (modelError) {
+          errorMessage = `Embedding model not found: ${modelError.message}. Please check available models at https://cloud.ibm.com/apidocs/watsonx-ai#text-embeddings or set VITE_WATSONX_EMBEDDING_MODEL in your .env file.`;
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
 
     return response.json();
@@ -191,6 +201,26 @@ class WatsonxServiceProxy {
   }
 
   /**
+   * List available foundation models (including embedding models)
+   */
+  async listAvailableModels(filters = {}) {
+    const queryParams = new URLSearchParams({
+      version: WATSONX_CONFIG.version
+    });
+    
+    if (filters.function_embedding) {
+      queryParams.append('filters', 'function_embedding');
+    }
+
+    return this.makeRequest(
+      `/ml/v1/foundation_model_specs?${queryParams.toString()}`,
+      {
+        method: 'GET'
+      }
+    );
+  }
+
+  /**
    * Generate text embeddings
    */
   async generateEmbeddings(params) {
@@ -200,18 +230,82 @@ class WatsonxServiceProxy {
       throw new Error('Project ID is not configured');
     }
 
+    // Default embedding model - can be overridden via params or env var
+    // Supported models per IBM docs:
+    // - ibm/slate-125m-english-rtrvr (768 dims, better performance)
+    // - ibm/slate-30m-english-rtrvr (384 dims, faster)
+    // - sentence-transformers/all-minilm-l6-v2 (384 dims)
+    // - intfloat/multilingual-e5-large (1024 dims, multilingual)
+    const defaultModel = import.meta.env.VITE_WATSONX_EMBEDDING_MODEL || 'ibm/slate-125m-english-rtrvr';
+    const modelId = params.model_id || defaultModel;
+
     const body = {
-      model_id: params.model_id || 'ibm/slate-125m-english-rtrvr',
+      model_id: modelId,
       inputs: Array.isArray(params.inputs) ? params.inputs : [params.inputs],
       project_id: projectId
     };
 
-    return this.makeRequest(
-      `/ml/v1/text/embeddings?version=${WATSONX_CONFIG.version}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(body)
+    // Try the requested model, with automatic fallback to other supported models
+    const fallbackModels = [
+      'ibm/slate-125m-english-rtrvr',  // 768 dims - best performance
+      'ibm/slate-30m-english-rtrvr',   // 384 dims - faster
+      'sentence-transformers/all-minilm-l6-v2',  // 384 dims - open source
+      'intfloat/multilingual-e5-large'  // 1024 dims - multilingual
+    ];
+
+    let lastError = null;
+    const modelsToTry = modelId === defaultModel 
+      ? fallbackModels 
+      : [modelId, ...fallbackModels.filter(m => m !== modelId)];
+
+    console.log(`[Embeddings] Trying ${modelsToTry.length} embedding models:`, modelsToTry);
+
+    for (let i = 0; i < modelsToTry.length; i++) {
+      const tryModel = modelsToTry[i];
+      try {
+        const tryBody = { ...body, model_id: tryModel };
+        console.log(`[Embeddings] Attempt ${i + 1}/${modelsToTry.length}: Trying model "${tryModel}"`);
+        const response = await this.makeRequest(
+          `/ml/v1/text/embeddings?version=${WATSONX_CONFIG.version}`,
+          {
+            method: 'POST',
+            body: JSON.stringify(tryBody)
+          }
+        );
+        if (tryModel !== modelId) {
+          console.log(`[Embeddings] ✓ Successfully using fallback model: ${tryModel} (original: ${modelId} was not available)`);
+        } else {
+          console.log(`[Embeddings] ✓ Successfully using requested model: ${tryModel}`);
+        }
+        return response;
+      } catch (error) {
+        lastError = error;
+        // Check for various model not found error patterns
+        const isModelNotFound = error.message && (
+          error.message.includes('model_not_supported') ||
+          error.message.includes('was not found') ||
+          error.message.includes('not available') ||
+          error.message.includes('unsupported') ||
+          error.message.includes('deprecated') ||
+          error.message.includes('removed')
+        );
+        
+        if (isModelNotFound) {
+          const attemptNum = modelsToTry.indexOf(tryModel) + 1;
+          console.warn(`[Embeddings] Model "${tryModel}" not available (${attemptNum}/${modelsToTry.length}), trying next...`);
+          continue;
+        }
+        // If it's a different error (not model-related), throw it immediately
+        throw error;
       }
+    }
+
+    // All models failed
+    throw new Error(
+      `None of the embedding models are available in your project. ` +
+      `Last error: ${lastError?.message || 'Unknown error'}. ` +
+      `Please check your Watson AI project settings to ensure embedding models are enabled. ` +
+      `You can list available models using: listAvailableModels({ function_embedding: true })`
     );
   }
 

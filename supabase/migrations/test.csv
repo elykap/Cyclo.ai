@@ -1,0 +1,4 @@
+product_id,product_name,price,amount,customer_id,date
+SKU-001,Widget A,19.99,2,CUST-123,2024-01-15
+SKU-002,Widget B,29.99,1,CUST-456,2024-01-16
+SKU-003,Widget C,15.50,3,CUST-123,2024-01-17
