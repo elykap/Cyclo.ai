@@ -431,6 +431,8 @@ body {
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 1rem;
+  word-break: break-word;
+  line-height: 1.1;
 }
 
 .metric-chart {
@@ -891,6 +893,55 @@ input[type="file"][id^="supporting-files-input"] {
   .profile-page h2 {
     font-size: 1.75rem;
   }
+}
+
+.profile-page {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.profile-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.profile-shell {
+  padding: 2rem 1.5rem 3rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.profile-content {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.profile-back-row {
+  margin-bottom: 1rem;
+}
+
+.profile-card {
+  padding: 2rem;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .error-message {

@@ -46,6 +46,7 @@ function Overview() {
   const businessType = profile?.business_type || 'Add your business type'
   const profileStatus = profile?.profile_complete ? 'Complete' : 'Incomplete'
   const profileStatusTone = profile?.profile_complete ? 'positive' : 'negative'
+  const subscriptionStatus = 'Premium'
 
   const previews = [
     {
@@ -135,9 +136,9 @@ function Overview() {
         <div className="metric-card">
           <div className="metric-header">
             <span className="metric-label">Account</span>
-            <span className="metric-change muted">{user?.email || 'Not signed in'}</span>
+            <span className="metric-change muted">{subscriptionStatus}</span>
           </div>
-          <div className="metric-value">👤</div>
+          <div className="metric-value">{user?.email || 'Not signed in'}</div>
           <div className="metric-chart">
             <div className="chart-bar"></div>
           </div>

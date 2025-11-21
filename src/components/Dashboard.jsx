@@ -85,15 +85,6 @@ function Dashboard({ user, theme, toggleTheme }) {
             <span className="nav-label">Inventory</span>
           </Link>
           <Link 
-            to="/messaging"
-            className={`nav-item ${activeTab === 'messaging' ? 'active' : ''}`}
-          >
-            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span className="nav-label">Messaging</span>
-          </Link>
-          <Link 
             to="/demographics"
             className={`nav-item ${activeTab === 'demographics' ? 'active' : ''}`}
           >
@@ -115,6 +106,15 @@ function Dashboard({ user, theme, toggleTheme }) {
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
             <span className="nav-label">PredictHQ Test</span>
+          </Link>
+          <Link 
+            to="/messaging"
+            className={`nav-item ${activeTab === 'messaging' ? 'active' : ''}`}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span className="nav-label">Messaging</span>
           </Link>
         </nav>
 

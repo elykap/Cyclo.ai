@@ -107,8 +107,8 @@ function LandingPage({ theme, toggleTheme, user }) {
             </div>
             <h3 className="feature-title">Customer Messaging</h3>
             <p className="feature-description">
-              Communicate seamlessly with your customers. Send messages, 
-              respond to inquiries, and build stronger relationships.
+              Chat with a personalized agent trained on your data to answer questions 
+              and respond to customers automatically.
             </p>
           </div>
 
