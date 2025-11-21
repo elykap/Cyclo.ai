@@ -85,14 +85,14 @@ function App() {
         if (!active) return
         if (error) {
           console.warn('Error fetching profile', error)
-          setProfileComplete(false)
+          setProfileComplete(null)
         } else {
-          setProfileComplete(Boolean(data?.profile_complete))
+          setProfileComplete(data?.profile_complete === true)
         }
       } catch (err) {
         if (active) {
           console.warn('Unexpected error fetching profile', err)
-          setProfileComplete(false)
+          setProfileComplete(null)
         }
       } finally {
         if (active) setProfileLoading(false)
@@ -157,10 +157,10 @@ function App() {
                 <div className="loading-container">
                   <div className="loading-spinner"></div>
                 </div>
-              ) : profileComplete ? (
-                <Navigate to="/overview" replace />
-              ) : (
+              ) : profileComplete === false ? (
                 <Navigate to="/profile" replace />
+              ) : (
+                <Navigate to="/overview" replace />
               )
             ) : (
               <LandingPage 
@@ -169,6 +169,18 @@ function App() {
                 user={user} 
               />
             )
+          } 
+        />
+
+        {/* Public landing page (accessible even when logged in) */}
+        <Route 
+          path="/welcome" 
+          element={
+            <LandingPage 
+              theme={theme} 
+              toggleTheme={toggleTheme} 
+              user={user} 
+            />
           } 
         />
 
@@ -201,10 +213,10 @@ function App() {
                 <div className="loading-container">
                   <div className="loading-spinner"></div>
                 </div>
-              ) : profileComplete ? (
-                <Dashboard user={user} theme={theme} toggleTheme={toggleTheme} />
-              ) : (
+              ) : profileComplete === false ? (
                 <Navigate to="/profile" replace />
+              ) : (
+                <Dashboard user={user} theme={theme} toggleTheme={toggleTheme} />
               )}
             </ProtectedRoute>
           }
@@ -222,7 +234,7 @@ function App() {
           path="*" 
           element={
             user ? (
-              profileComplete ? <Navigate to="/overview" replace /> : <Navigate to="/profile" replace />
+              profileComplete === false ? <Navigate to="/profile" replace /> : <Navigate to="/overview" replace />
             ) : (
               <Navigate to="/" replace />
             )

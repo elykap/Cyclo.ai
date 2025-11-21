@@ -56,7 +56,7 @@ function Dashboard({ user, theme, toggleTheme }) {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-header">
-          <Link to="/" className="logo logo-clickable">
+          <Link to="/welcome" className="logo logo-clickable">
             <h1>Cyclo</h1>
           </Link>
         </div>
@@ -187,4 +187,3 @@ function Dashboard({ user, theme, toggleTheme }) {
 }
 
 export default Dashboard
-
