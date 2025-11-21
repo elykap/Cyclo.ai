@@ -1,12 +1,22 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AuthModal from './AuthModal'
 
-function LandingPage({ onGetStarted, theme, toggleTheme, user }) {
+function LandingPage({ theme, toggleTheme, user }) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const navigate = useNavigate()
 
   const handleAuthSuccess = () => {
     // User is now logged in, navigate to dashboard
-    onGetStarted()
+    navigate('/overview')
+  }
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/overview')
+    } else {
+      setIsAuthModalOpen(true)
+    }
   }
 
   return (
@@ -36,7 +46,7 @@ function LandingPage({ onGetStarted, theme, toggleTheme, user }) {
               )}
             </button>
             {user ? (
-              <button className="login-button" onClick={onGetStarted}>
+              <button className="login-button" onClick={() => navigate('/overview')}>
                 Go to Dashboard
               </button>
             ) : (
@@ -64,13 +74,7 @@ function LandingPage({ onGetStarted, theme, toggleTheme, user }) {
           </p>
           <button 
             className="get-started-button" 
-            onClick={() => {
-              if (user) {
-                onGetStarted()
-              } else {
-                setIsAuthModalOpen(true)
-              }
-            }}
+            onClick={handleGetStarted}
           >
             Get Started
           </button>
