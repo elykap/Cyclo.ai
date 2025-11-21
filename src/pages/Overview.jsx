@@ -74,16 +74,16 @@ function Overview() {
       to: '/inventory'
     },
     {
-      title: 'Suggestions',
-      description: 'Analysis-based recommendations generated from your customer data.',
-      action: 'View Suggestions',
+      title: 'Trends',
+      description: 'Spot patterns and insights distilled from your data in the Trend page.',
+      action: 'View Trends',
       icon: (
         <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
+          <polyline points="4 14 9 9 13 13 20 6"></polyline>
+          <polyline points="14 6 20 6 20 12"></polyline>
         </svg>
       ),
-      to: '/demographics'
+      to: '/trends'
     },
     {
       title: 'Settings',
@@ -103,7 +103,7 @@ function Overview() {
     <>
       {/* Highlights */}
       <div className="metrics-grid">
-        <div className="metric-card">
+        <div className="metric-card compact">
           <div className="metric-header">
             <span className="metric-label">Profile status</span>
             <span className={`metric-change ${profileStatusTone}`}>{profileStatus}</span>
@@ -113,32 +113,32 @@ function Overview() {
             <div className="chart-bar"></div>
           </div>
         </div>
-        <div className="metric-card">
+        <div className="metric-card compact">
           <div className="metric-header">
-            <span className="metric-label">Uploads</span>
-            <span className="metric-change positive">{uploadsCount} file{uploadsCount === 1 ? '' : 's'}</span>
+            <span className="metric-label">Inventory</span>
+            <span className="metric-change positive">CSV imports</span>
           </div>
-          <div className="metric-value">{uploadsCount}</div>
+          <div className="metric-value">{uploadsCount} upload{uploadsCount === 1 ? '' : 's'}</div>
           <div className="metric-chart">
             <div className="chart-bar"></div>
           </div>
         </div>
-        <div className="metric-card">
+        <div className="metric-card compact">
           <div className="metric-header">
-            <span className="metric-label">Business type</span>
-            <span className="metric-change">{businessType}</span>
+            <span className="metric-label">Events feed</span>
+            <span className="metric-change positive">Upcoming</span>
           </div>
-          <div className="metric-value">🏷️</div>
+          <div className="metric-value">Nearby events</div>
           <div className="metric-chart">
             <div className="chart-bar"></div>
           </div>
         </div>
-        <div className="metric-card">
+        <div className="metric-card compact">
           <div className="metric-header">
             <span className="metric-label">Account</span>
-            <span className="metric-change muted">{subscriptionStatus}</span>
+            <span className="metric-change muted">{user?.email || 'Not signed in'}</span>
           </div>
-          <div className="metric-value">{user?.email || 'Not signed in'}</div>
+          <div className="metric-value">{subscriptionStatus} plan</div>
           <div className="metric-chart">
             <div className="chart-bar"></div>
           </div>

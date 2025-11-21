@@ -227,6 +227,7 @@ function App() {
           <Route path="recommendations" element={<RecommendationsPage />} />
           <Route path="messaging" element={<MessagingPage />} />
           <Route path="trends" element={<Trends />} />
+          <Route path="demographics" element={<Navigate to="/trends" replace />} />
           <Route path="settings" element={<Settings />} />
           <Route path="events" element={<PredictHQTest />} />
         </Route>

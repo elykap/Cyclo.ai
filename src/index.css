@@ -435,6 +435,18 @@ body {
   line-height: 1.1;
 }
 
+.metric-card.compact .metric-header {
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: center;
+}
+
+.metric-card.compact .metric-value {
+  font-size: 1.25rem;
+  text-align: center;
+}
+
 .metric-chart {
   height: 4px;
   background: var(--bg-chart);
