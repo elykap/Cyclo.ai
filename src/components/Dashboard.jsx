@@ -33,8 +33,7 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'inventory': return 'Inventory'
       case 'recommendations': return 'Recommendations'
       case 'messaging': return 'Cyclo Bot'
-      case 'demographics': return 'Demographics'
-      case 'community': return 'Community'
+      case 'trends': return 'Trends'
       case 'settings': return 'Settings'
       case 'events': return 'Upcoming Events'
       default: return 'Dashboard'
@@ -47,8 +46,7 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'inventory': return 'Manage your inventory and track stock levels.'
       case 'recommendations': return 'AI-powered product recommendations and insights.'
       case 'messaging': return 'Chat with a personalized agent trained on your data.'
-      case 'demographics': return 'View demographic forecasts and upcoming events.'
-      case 'community': return 'Connect with other users, share questions and insights.'
+      case 'trends': return 'Analyze sales trends and get AI-powered marketing recommendations.'
       case 'settings': return 'Configure your account and preferences.'
       case 'events': return 'Automatically pulling nearby upcoming events for planning.'
       default: return ''
@@ -109,29 +107,13 @@ function Dashboard({ user, theme, toggleTheme }) {
             <span className="nav-label">Cyclo Bot</span>
           </Link>
           <Link 
-            to="/demographics"
-            className={`nav-item ${activeTab === 'demographics' ? 'active' : ''}`}
+            to="/trends"
+            className={`nav-item ${activeTab === 'trends' ? 'active' : ''}`}
           >
             <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-              <line x1="3" y1="21" x2="3" y2="15"></line>
-              <line x1="6" y1="21" x2="6" y2="12"></line>
-              <line x1="9" y1="21" x2="9" y2="18"></line>
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
             </svg>
-            <span className="nav-label">Demographics</span>
-          </Link>
-          <Link 
-            to="/community"
-            className={`nav-item ${activeTab === 'community' ? 'active' : ''}`}
-          >
-            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <span className="nav-label">Community</span>
+            <span className="nav-label">Trends</span>
           </Link>
           <Link 
             to="/events"
