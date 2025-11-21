@@ -130,10 +130,22 @@ function Dashboard({ user, theme, toggleTheme }) {
       </aside>
 
       {/* Main Content */}
-      <main className="main-content">
+      <main className={`main-content ${activeTab}`}>
         {/* Header */}
         <header className="dashboard-header">
           <div className="header-left">
+            {activeTab !== 'overview' && (
+              <button
+                className="icon-button back-button"
+                onClick={() => navigate('/overview')}
+                title="Back to overview"
+                aria-label="Back to overview"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+            )}
             <h2>{getPageTitle()}</h2>
             <p className="header-subtitle">{getPageSubtitle()}</p>
           </div>
