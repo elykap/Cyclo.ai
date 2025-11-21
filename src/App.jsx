@@ -9,6 +9,7 @@ import Inventory from './pages/Inventory'
 import MessagingPage from './pages/MessagingPage'
 import Demographics from './pages/Demographics'
 import Settings from './pages/Settings'
+import PredictHQTest from './pages/PredictHQTest'
 import { supabase } from './supabaseClient'
 
 function App() {
@@ -147,6 +148,7 @@ function App() {
           <Route path="messaging" element={<MessagingPage />} />
           <Route path="demographics" element={<Demographics />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="predicthq-test" element={<PredictHQTest />} />
         </Route>
 
         {/* Redirect any unknown routes */}
