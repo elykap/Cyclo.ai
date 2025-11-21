@@ -146,7 +146,7 @@ function Messaging() {
       <div className="messaging-header">
         <div className="messaging-header-content">
           <h3>Watson AI Assistant</h3>
-          <p className="messaging-subtitle">Ask questions and get intelligent responses</p>
+          <p className="messaging-subtitle">Chat with a personalized agent trained on your business data</p>
         </div>
         <button 
           className="clear-chat-button" 
@@ -267,4 +267,3 @@ function Messaging() {
 }
 
 export default Messaging
-
