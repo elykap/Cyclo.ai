@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { auth } from './firebase'
 import LandingPage from './LandingPage'
+import ProfilePage from './ProfilePage'
+import { supabase } from './supabaseClient'
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview')
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [profileExists, setProfileExists] = useState(false)
   const [currentPage, setCurrentPage] = useState(() => {
     try {
       const stored = localStorage.getItem('currentPage')
@@ -29,21 +30,36 @@ function App() {
     return 'light'
   })
 
-  // Check authentication state
+  // Supabase auth: listen for auth state changes and check for existing profile
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-      setLoading(false)
-      // Do NOT auto-redirect to dashboard on auth state change.
-      // Keep the user on the current page (e.g., landing) unless
-      // navigation is triggered explicitly by UI actions such as
-      // clicking "Get Started" or successful sign-in flow.
-      if (!currentUser) {
-        setCurrentPage('landing')
+    let mounted = true
+    const init = async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        const session = data.session
+        if (session?.user && mounted) {
+          setUser(session.user)
+        }
+      } catch (err) {
+        console.warn('Error getting supabase session', err)
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    init()
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user)
+      } else {
+        setUser(null)
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      mounted = false
+      listener?.subscription?.unsubscribe?.()
+    }
   }, [])
 
   useEffect(() => {
@@ -88,9 +104,34 @@ function App() {
   }
 
   const handleGetStarted = () => {
-    if (user) {
-      setCurrentPage('dashboard')
+    if (!user) {
+      // If no user, prompt login (LandingPage will open modal)
+      setCurrentPage('landing')
+      return
     }
+
+    // Check profile in Supabase before routing to dashboard
+    ;(async () => {
+      try {
+        const uid = user.id || user.id || user?.user_metadata?.sub || user?.id
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('profile_complete')
+          .eq('id', uid)
+          .single()
+        if (error && error.code !== 'PGRST116') {
+          // if not found, go to profile
+          setCurrentPage('profile')
+        } else if (data && data.profile_complete) {
+          setCurrentPage('dashboard')
+        } else {
+          setCurrentPage('profile')
+        }
+      } catch (err) {
+        console.error('Error checking profile:', err)
+        setCurrentPage('profile')
+      }
+    })()
   }
 
   const handleGoToLanding = () => {
@@ -99,11 +140,12 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth)
-      setCurrentPage('landing')
-    } catch (error) {
-      console.error('Error signing out:', error)
+      await supabase.auth.signOut()
+    } catch (err) {
+      console.warn('Error signing out', err)
     }
+    setUser(null)
+    setCurrentPage('landing')
   }
 
   // Show loading state
@@ -118,6 +160,10 @@ function App() {
   // Show landing page if not on dashboard or not logged in
   if (currentPage === 'landing' || !user) {
     return <LandingPage onGetStarted={handleGetStarted} theme={theme} toggleTheme={toggleTheme} user={user} />
+  }
+
+  if (currentPage === 'profile') {
+    return <ProfilePage user={user} onComplete={() => setCurrentPage('dashboard')} theme={theme} toggleTheme={toggleTheme} />
   }
 
   return (

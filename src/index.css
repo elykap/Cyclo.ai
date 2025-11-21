@@ -656,7 +656,7 @@ body {
   border-radius: 8px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 1.02rem; /* slightly larger for readability */
   transition: all 0.2s;
 }
 
@@ -664,6 +664,100 @@ body {
   outline: none;
   border-color: var(--border-action-hover);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Make textarea look like other inputs */
+.form-group textarea {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1.02rem; /* match inputs */
+  transition: all 0.2s;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--border-action-hover);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.file-list {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Styled file upload button to match theme and use monochrome cloud icon */
+.file-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-action);
+  color: var(--text-primary);
+  border: 1px solid var(--border-action);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.15s;
+}
+
+.file-upload-button svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+.file-upload-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--bg-action-hover);
+}
+
+/* Ensure file input is visually hidden but accessible */
+input[type="file"][id^="supporting-files-input"] {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden;
+}
+
+/* Profile page specific tweaks */
+.profile-page h2 {
+  font-size: 2.5rem; /* larger header */
+  line-height: 1.05;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.profile-page .muted {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* Make the file upload button a fixed size and not stretch */
+.file-upload-button {
+  justify-content: center;
+  align-self: flex-start; /* avoid stretching to full width */
+  display: inline-flex; /* let auth-submit-button provide sizing */
+  gap: 0.6rem;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .file-upload-button {
+    width: 100%;
+  }
+  .profile-page h2 {
+    font-size: 1.75rem;
+  }
 }
 
 .error-message {
