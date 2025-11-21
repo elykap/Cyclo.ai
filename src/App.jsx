@@ -152,6 +152,16 @@ function App() {
             <span className="nav-label">Inventory</span>
           </button>
           <button 
+            className={`nav-item ${activeTab === 'trends' ? 'active' : ''}`}
+            onClick={() => setActiveTab('trends')}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+            <span className="nav-label">Trends</span>
+          </button>
+          <button 
             className={`nav-item ${activeTab === 'messaging' ? 'active' : ''}`}
             onClick={() => setActiveTab('messaging')}
           >
@@ -194,6 +204,7 @@ function App() {
             <h2>
               {activeTab === 'overview' ? 'Overview' :
                activeTab === 'inventory' ? 'Inventory' :
+               activeTab === 'trends' ? 'Trends' :
                activeTab === 'messaging' ? 'Messaging' :
                activeTab === 'demographics' ? 'Demographics' :
                activeTab === 'settings' ? 'Settings' : 'Dashboard'}
@@ -201,6 +212,7 @@ function App() {
             <p className="header-subtitle">
               {activeTab === 'overview' ? 'Welcome back! Here\'s your overview.' :
                activeTab === 'inventory' ? 'Manage your inventory and track stock levels.' :
+               activeTab === 'trends' ? 'View trends and metrics across your business.' :
                activeTab === 'messaging' ? 'Communicate with your customers.' :
                activeTab === 'demographics' ? 'View demographic forecasts and upcoming events.' :
                activeTab === 'settings' ? 'Configure your account and preferences.' : ''}
@@ -434,6 +446,20 @@ function App() {
               </div>
               <div className="section-placeholder">
                 <p>Inventory tracking and management features will be displayed here.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Trends Section */}
+        {activeTab === 'trends' && (
+          <div className="section-content">
+            <div className="content-card">
+              <div className="card-header">
+                <h3>Trends</h3>
+              </div>
+              <div className="section-placeholder">
+                <p></p>
               </div>
             </div>
           </div>
