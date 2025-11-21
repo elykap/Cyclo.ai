@@ -134,7 +134,7 @@ function Messaging() {
       {
         id: 1,
         role: 'assistant',
-        content: 'Hello! I\'m your Watson AI assistant. How can I help you today?',
+        content: 'Hello! I\'m your personalized assistant. How can I help you today?',
         timestamp: new Date()
       }
     ])
@@ -145,8 +145,8 @@ function Messaging() {
     <div className="messaging-container">
       <div className="messaging-header">
         <div className="messaging-header-content">
-          <h3>Watson AI Assistant</h3>
-          <p className="messaging-subtitle">Chat with a personalized agent trained on your business data</p>
+          <h3>Cyclo Consultant</h3>
+          <p className="messaging-subtitle">Voice your questions here to a personalized agent trained on your business data</p>
         </div>
         <button 
           className="clear-chat-button" 
