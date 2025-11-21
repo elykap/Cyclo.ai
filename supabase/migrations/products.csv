@@ -1,0 +1,13 @@
+product_name,product_id,total_sales,current_stock
+"Hot Coffee - Medium","DRK-001",320,45
+"Latte - Vanilla 16oz","DRK-002",210,30
+"Cold Brew - 20oz","DRK-003",185,24
+"Chocolate Chip Cookie","BKE-001",260,40
+"Cinnamon Roll","BKE-002",190,28
+"Blueberry Muffin","BKE-003",175,22
+"Morning Combo: Coffee + Muffin","CMB-001",95,12
+"Latte + Cookie Combo","CMB-002",80,10
+"Detroit House Blend Beans 12oz","RET-001",140,35
+"Riverfront Dark Roast Beans 12oz","RET-002",110,27
+"Motor City Brew Mug","MRH-001",60,18
+"Detroit Skyline Tote Bag","MRH-002",45,15

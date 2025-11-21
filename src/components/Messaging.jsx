@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-// Using proxy service to avoid CORS issues (recommended for production)
-import watsonxService from '../services/watsonxServiceProxy'
+import ragService from '../services/ragService'
 
-function Messaging() {
+function Messaging({ user }) {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -13,7 +12,9 @@ function Messaging() {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isRetrievingContext, setIsRetrievingContext] = useState(false)
   const [error, setError] = useState(null)
+  const [useRAG, setUseRAG] = useState(true) // Toggle for RAG vs regular chat
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -48,51 +49,60 @@ function Messaging() {
     setError(null)
 
     try {
-      // Prepare messages for Watson AI (format: { role: 'user'|'assistant', content: string })
-      const chatMessages = messages
-        .filter(msg => msg.role !== 'system')
-        .map(msg => ({
-          role: msg.role,
-          content: msg.content
-        }))
-        .concat([{
-          role: 'user',
-          content: userMessage.content
-        }])
+      let assistantContent = ''
 
-      // Call Watson AI chat completion
-      // Using granite-3-8b-instruct which is available for Pay per token deployment
-      const response = await watsonxService.chatCompletion({
-        messages: chatMessages,
-        model_id: 'ibm/granite-3-8b-instruct',
-        parameters: {
-          max_tokens: 1000,
-          temperature: 0.7
+      if (useRAG && user?.id) {
+        // Use RAG with document context
+        setIsRetrievingContext(true)
+        assistantContent = await ragService.generateRAGResponse(
+          userMessage.content,
+          user.id,
+          {
+            matchThreshold: 0.3, // Lower threshold to find more matches (0.3 = 70% similarity)
+            matchCount: 5,
+            includeContext: true,
+            systemPrompt: 'You are a helpful AI assistant for the user\'s business. Answer questions based on the provided context from the user\'s uploaded documents. Use the context to provide specific, personalized answers about their business. If the context contains relevant information, use it directly. If the context doesn\'t contain relevant information, acknowledge that you don\'t have that information in the documents but can still help with general knowledge.'
+          }
+        )
+        setIsRetrievingContext(false)
+      } else {
+        // Fallback to regular chat (no RAG)
+        const watsonxService = (await import('../services/watsonxServiceProxy')).default
+        
+        const chatMessages = messages
+          .filter(msg => msg.role !== 'system')
+          .map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+          .concat([{
+            role: 'user',
+            content: userMessage.content
+          }])
+
+        const response = await watsonxService.chatCompletion({
+          messages: chatMessages,
+          model_id: 'ibm/granite-3-8b-instruct',
+          parameters: {
+            max_tokens: 1000,
+            temperature: 0.7
+          }
+        })
+
+        if (response.results && response.results.length > 0) {
+          assistantContent = response.results[0].generated_text || 
+                            response.results[0].content || ''
+        } else if (response.choices && response.choices.length > 0) {
+          assistantContent = response.choices[0].message?.content || ''
+        } else if (response.message) {
+          assistantContent = response.message
+        } else if (typeof response === 'string') {
+          assistantContent = response
         }
-      })
-
-      // Extract the assistant's response
-      // Watson AI chat API can return responses in different formats
-      let assistantContent = '';
-      
-      if (response.results && response.results.length > 0) {
-        // Format: { results: [{ generated_text: "..." }] }
-        assistantContent = response.results[0].generated_text || 
-                          response.results[0].content ||
-                          '';
-      } else if (response.choices && response.choices.length > 0) {
-        // Format: { choices: [{ message: { content: "..." } }] }
-        assistantContent = response.choices[0].message?.content || '';
-      } else if (response.message) {
-        // Direct message format
-        assistantContent = response.message;
-      } else if (typeof response === 'string') {
-        // String response
-        assistantContent = response;
       }
       
       if (!assistantContent || assistantContent.trim() === '') {
-        assistantContent = 'I apologize, but I couldn\'t generate a response. Please try again.';
+        assistantContent = 'I apologize, but I couldn\'t generate a response. Please try again.'
       }
 
       const assistantMessage = {
@@ -104,13 +114,14 @@ function Messaging() {
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (err) {
-      console.error('Error calling Watson AI:', err)
-      setError(err.message || 'Failed to get response from Watson AI. Please check your configuration.')
+      console.error('Error calling AI:', err)
+      setIsRetrievingContext(false)
+      setError(err.message || 'Failed to get response. Please check your configuration.')
       
       const errorMessage = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: `Error: ${err.message || 'Failed to get response from Watson AI. Please check your configuration.'}`,
+        content: `Error: ${err.message || 'Failed to get response. Please check your configuration.'}`,
         timestamp: new Date(),
         isError: true
       }
@@ -118,6 +129,7 @@ function Messaging() {
       setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
+      setIsRetrievingContext(false)
       inputRef.current?.focus()
     }
   }
@@ -146,7 +158,22 @@ function Messaging() {
       <div className="messaging-header">
         <div className="messaging-header-content">
           <h3>Cyclo Consultant</h3>
-          <p className="messaging-subtitle">Voice your questions here to a personalized agent trained on your business data</p>
+          <p className="messaging-subtitle">
+            {useRAG && user?.id 
+              ? 'Ask questions and get personalized responses based on your documents' 
+              : 'Voice your questions here to a personalized agent trained on your business data'}
+          </p>
+          {user?.id && (
+            <label className="rag-toggle" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', fontSize: '0.875rem' }}>
+              <input
+                type="checkbox"
+                checked={useRAG}
+                onChange={(e) => setUseRAG(e.target.checked)}
+                style={{ cursor: 'pointer' }}
+              />
+              <span>Use document context (RAG)</span>
+            </label>
+          )}
         </div>
         <button 
           className="clear-chat-button" 
@@ -200,7 +227,7 @@ function Messaging() {
           </div>
         ))}
         
-        {isLoading && (
+        {(isLoading || isRetrievingContext) && (
           <div className="message assistant loading">
             <div className="message-avatar">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -211,11 +238,17 @@ function Messaging() {
             </div>
             <div className="message-content">
               <div className="message-text">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
+                {isRetrievingContext ? (
+                  <span style={{ fontStyle: 'italic', color: 'var(--text-secondary, #666)' }}>
+                    Retrieving relevant context from your documents...
+                  </span>
+                ) : (
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

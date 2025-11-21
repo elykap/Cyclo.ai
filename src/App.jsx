@@ -6,8 +6,10 @@ import Dashboard from './components/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import Overview from './pages/Overview'
 import Inventory from './pages/Inventory'
+import RecommendationsPage from './pages/RecommendationsPage'
 import MessagingPage from './pages/MessagingPage'
 import Demographics from './pages/Demographics'
+import Community from './pages/Community'
 import Settings from './pages/Settings'
 import PredictHQTest from './pages/PredictHQTest'
 import { supabase } from './supabaseClient'
@@ -223,8 +225,10 @@ function App() {
         >
           <Route path="overview" element={<Overview />} />
           <Route path="inventory" element={<Inventory />} />
+          <Route path="recommendations" element={<RecommendationsPage />} />
           <Route path="messaging" element={<MessagingPage />} />
           <Route path="demographics" element={<Demographics />} />
+          <Route path="community" element={<Community />} />
           <Route path="settings" element={<Settings />} />
           <Route path="events" element={<PredictHQTest />} />
         </Route>

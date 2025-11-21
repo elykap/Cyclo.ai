@@ -31,8 +31,10 @@ function Dashboard({ user, theme, toggleTheme }) {
     switch (activeTab) {
       case 'overview': return 'Overview'
       case 'inventory': return 'Inventory'
+      case 'recommendations': return 'Recommendations'
       case 'messaging': return 'Cyclo Bot'
-      case 'demographics': return 'Suggestions'
+      case 'demographics': return 'Demographics'
+      case 'community': return 'Community'
       case 'settings': return 'Settings'
       case 'events': return 'Upcoming Events'
       default: return 'Dashboard'
@@ -43,8 +45,10 @@ function Dashboard({ user, theme, toggleTheme }) {
     switch (activeTab) {
       case 'overview': return 'Welcome back! Here\'s your overview.'
       case 'inventory': return 'Manage your inventory and track stock levels.'
+      case 'recommendations': return 'AI-powered product recommendations and insights.'
       case 'messaging': return 'Chat with a personalized agent trained on your data.'
-      case 'demographics': return 'Get analysis-based suggestions from your customer data.'
+      case 'demographics': return 'View demographic forecasts and upcoming events.'
+      case 'community': return 'Connect with other users, share questions and insights.'
       case 'settings': return 'Configure your account and preferences.'
       case 'events': return 'Automatically pulling nearby upcoming events for planning.'
       default: return ''
@@ -85,6 +89,26 @@ function Dashboard({ user, theme, toggleTheme }) {
             <span className="nav-label">Inventory</span>
           </Link>
           <Link 
+            to="/recommendations"
+            className={`nav-item ${activeTab === 'recommendations' ? 'active' : ''}`}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+              <path d="M2 17l10 5 10-5"></path>
+              <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            <span className="nav-label">Recommendations</span>
+          </Link>
+          <Link 
+            to="/messaging"
+            className={`nav-item ${activeTab === 'messaging' ? 'active' : ''}`}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span className="nav-label">Cyclo Bot</span>
+          </Link>
+          <Link 
             to="/demographics"
             className={`nav-item ${activeTab === 'demographics' ? 'active' : ''}`}
           >
@@ -95,7 +119,19 @@ function Dashboard({ user, theme, toggleTheme }) {
               <line x1="6" y1="21" x2="6" y2="12"></line>
               <line x1="9" y1="21" x2="9" y2="18"></line>
             </svg>
-            <span className="nav-label">Suggestions</span>
+            <span className="nav-label">Demographics</span>
+          </Link>
+          <Link 
+            to="/community"
+            className={`nav-item ${activeTab === 'community' ? 'active' : ''}`}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span className="nav-label">Community</span>
           </Link>
           <Link 
             to="/events"
@@ -106,15 +142,6 @@ function Dashboard({ user, theme, toggleTheme }) {
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
             <span className="nav-label">Upcoming Events</span>
-          </Link>
-          <Link 
-            to="/messaging"
-            className={`nav-item ${activeTab === 'messaging' ? 'active' : ''}`}
-          >
-            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span className="nav-label">Cyclo Bot</span>
           </Link>
         </nav>
 
