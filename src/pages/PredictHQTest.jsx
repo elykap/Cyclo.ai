@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../supabaseClient'
 import predicthqService from '../services/predicthqService'
 import watsonxService from '../services/watsonxServiceProxy'
 
 function PredictHQTest() {
+  const { user } = useAuth()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -87,7 +90,6 @@ function PredictHQTest() {
         { id: 'conferences', label: 'Conferences' },
         { id: 'festivals', label: 'Festivals' },
         { id: 'performing-arts', label: 'Performing Arts' },
-        { id: 'community', label: 'Community' },
         { id: 'expos', label: 'Expos' },
         { id: 'school-holidays', label: 'School Holidays' }
       ])
@@ -129,30 +131,141 @@ function PredictHQTest() {
       if (eventsData.length > 0) {
         setAnalyzing(true)
         try {
-          const analysisPrompt = `Analyze the following upcoming events and provide:
-1. A brief summary of major events and their significance
-2. Key action items for a business owner (inventory, staffing, marketing opportunities)
-3. Business impact insights and revenue opportunities
-4. Top 3-5 specific recommendations
+          // Gather business context for personalized recommendations
+          let businessContext = {}
+          
+          if (user?.id) {
+            try {
+              // Get business profile
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('business_name, business_type, description')
+                .eq('id', user.id)
+                .maybeSingle()
+              
+              if (profile) {
+                businessContext.businessName = profile.business_name || 'Business'
+                businessContext.businessType = profile.business_type || ''
+                businessContext.description = profile.description || ''
+              }
 
-Events data:
+              // Get top selling products from inventory
+              const { data: topProducts } = await supabase
+                .from('inventory')
+                .select('product_name, total_sales, current_stock')
+                .eq('user_id', user.id)
+                .order('total_sales', { ascending: false })
+                .limit(10)
+              
+              if (topProducts && topProducts.length > 0) {
+                businessContext.topProducts = topProducts.map(p => ({
+                  name: p.product_name,
+                  sales: parseFloat(p.total_sales || 0),
+                  stock: p.current_stock || 0
+                }))
+              }
+
+              // Get recent POS transaction patterns
+              const { data: recentTransactions } = await supabase
+                .from('pos_transactions')
+                .select('product_name, amount, date')
+                .eq('user_id', user.id)
+                .order('date', { ascending: false })
+                .limit(50)
+              
+              if (recentTransactions && recentTransactions.length > 0) {
+                const productFrequency = {}
+                recentTransactions.forEach(t => {
+                  const product = t.product_name || 'Unknown'
+                  productFrequency[product] = (productFrequency[product] || 0) + (parseFloat(t.amount) || 1)
+                })
+                businessContext.popularProducts = Object.entries(productFrequency)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 5)
+                  .map(([name, count]) => ({ name, frequency: count }))
+              }
+            } catch (contextError) {
+              console.warn('Error loading business context:', contextError)
+              // Continue without context if it fails
+            }
+          }
+
+          // Build comprehensive prompt with business context
+          const businessInfo = businessContext.businessName 
+            ? `\n\nBUSINESS CONTEXT:\n` +
+              `Business Name: ${businessContext.businessName}\n` +
+              `Business Type: ${businessContext.businessType || 'Not specified'}\n` +
+              (businessContext.description ? `Description: ${businessContext.description}\n` : '') +
+              (businessContext.topProducts?.length > 0 
+                ? `Top Selling Products: ${businessContext.topProducts.map(p => `${p.name} ($${p.sales.toFixed(2)} sales, ${p.stock} in stock)`).join(', ')}\n`
+                : '') +
+              (businessContext.popularProducts?.length > 0
+                ? `Frequently Sold Items: ${businessContext.popularProducts.map(p => p.name).join(', ')}\n`
+                : '')
+            : ''
+
+          const analysisPrompt = `You are a strategic business consultant analyzing upcoming events to create a comprehensive action plan for a business.
+
+${businessInfo}
+
+UPCOMING EVENTS (Next 30 Days):
 ${JSON.stringify(eventsData.slice(0, 30).map(e => ({
   title: e.title,
   category: e.category,
   start: e.start,
   end: e.end,
   location: e.location?.name || `${e.location?.lat}, ${e.location?.lon}`,
-  attendance: e.phq_attendance ? `${e.phq_attendance.low?.toLocaleString()}-${e.phq_attendance.high?.toLocaleString()}` : 'unknown',
-  description: e.description?.substring(0, 200) || 'No description'
+  attendance: e.phq_attendance ? `${e.phq_attendance.low?.toLocaleString()}-${e.phq_attendance.high?.toLocaleString()} attendees` : 'Attendance unknown',
+  description: e.description?.substring(0, 300) || 'No description available'
 })), null, 2)}
 
-Provide your analysis in a clear, actionable format with specific recommendations.`
+YOUR TASK:
+Create a detailed, actionable strategic plan that directly relates these events to the business. Consider:
+
+1. **INVENTORY PLANNING** (if business context available):
+   - Which products should be stocked up based on event types and expected attendance?
+   - What inventory levels are needed for peak event days?
+   - Are there any product gaps that could be filled for these events?
+
+2. **STAFFING & OPERATIONS**:
+   - When will you need additional staff based on event attendance and dates?
+   - What are the peak hours/days to prepare for?
+   - Any special operational considerations for high-traffic events?
+
+3. **MARKETING & PROMOTIONS**:
+   - Specific marketing opportunities tied to each major event
+   - Event-themed promotions or partnerships
+   - Social media content ideas related to events
+   - How to position the business to event attendees
+
+4. **REVENUE OPTIMIZATION**:
+   - Pricing strategies for event days
+   - Bundle deals or special offers for event-goers
+   - Cross-selling opportunities based on event types
+
+5. **TIMELINE & ACTION PLAN**:
+   - Week-by-week action items leading up to major events
+   - Critical deadlines (inventory orders, marketing campaigns, staffing)
+   - Priority ranking of events by business impact potential
+
+FORMAT YOUR RESPONSE AS:
+- **Executive Summary**: 2-3 sentence overview of the biggest opportunities
+- **Top 5 Priority Actions**: Most critical items with specific dates/deadlines
+- **Event-Specific Strategies**: For each major event (3+ events), provide:
+  * Event name and date
+  * Expected business impact (High/Medium/Low)
+  * Specific action items (inventory, staffing, marketing)
+  * Revenue opportunity estimate
+- **Weekly Action Timeline**: Week-by-week breakdown of what to do when
+- **Risk Mitigation**: Potential challenges and how to prepare
+
+Be specific, data-driven, and directly tie recommendations to the business context provided.`
 
           const watsonResponse = await watsonxService.chatCompletion({
             messages: [
               {
                 role: 'system',
-                content: 'You are a business intelligence assistant that analyzes events data and provides actionable insights for business owners. Focus on practical recommendations for inventory, staffing, marketing, and revenue opportunities. Be specific and actionable.'
+                content: 'You are an expert business strategist and consultant specializing in event-driven business planning. You analyze upcoming events and create detailed, actionable strategic plans that help businesses maximize revenue opportunities, optimize operations, and prepare effectively. Your recommendations are always specific, data-driven, and tailored to the unique business context provided. You think strategically about inventory, staffing, marketing, and revenue optimization.'
               },
               {
                 role: 'user',
@@ -161,8 +274,8 @@ Provide your analysis in a clear, actionable format with specific recommendation
             ],
             model_id: 'ibm/granite-3-8b-instruct',
             parameters: {
-              max_tokens: 2000,
-              temperature: 0.7
+              max_tokens: 3000,
+              temperature: 0.6
             }
           })
 
