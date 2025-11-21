@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 
@@ -9,8 +9,88 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
   const [website, setWebsite] = useState('')
   const [description, setDescription] = useState('')
   const [supportingFiles, setSupportingFiles] = useState([])
+  const [existingFiles, setExistingFiles] = useState([])
+  const [originalFiles, setOriginalFiles] = useState([])
+  const [initialLoading, setInitialLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const deriveFileName = (url) => {
+    try {
+      const pathname = new URL(url).pathname
+      const parts = pathname.split('/')
+      return decodeURIComponent(parts[parts.length - 1]) || url
+    } catch (err) {
+      const parts = url.split('/')
+      return decodeURIComponent(parts[parts.length - 1] || url)
+    }
+  }
+
+  const getStoragePathFromUrl = (url) => {
+    try {
+      const parsed = new URL(url)
+      // Public bucket pattern: /storage/v1/object/public/uploads/<path>
+      const marker = '/storage/v1/object/public/uploads/'
+      const idx = parsed.pathname.indexOf(marker)
+      if (idx !== -1) {
+        return decodeURIComponent(parsed.pathname.slice(idx + marker.length))
+      }
+      // Signed URL or other patterns may have /object/sign/uploads/<path>
+      const signMarker = '/storage/v1/object/sign/uploads/'
+      const signIdx = parsed.pathname.indexOf(signMarker)
+      if (signIdx !== -1) {
+        return decodeURIComponent(parsed.pathname.slice(signIdx + signMarker.length))
+      }
+      // Fallback: remove leading slash from pathname
+      return decodeURIComponent(parsed.pathname.replace(/^\//, ''))
+    } catch (err) {
+      // Last resort, strip query and host manually
+      const noQuery = url.split('?')[0]
+      const parts = noQuery.split('/uploads/')
+      if (parts.length > 1) {
+        return decodeURIComponent(parts[1])
+      }
+      return null
+    }
+  }
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user?.id) {
+        setInitialLoading(false)
+        return
+      }
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('profiles')
+          .select('business_name,business_type,website,description,supporting_files')
+          .eq('id', user.id)
+          .maybeSingle()
+
+        if (fetchError) {
+          console.warn('Error loading profile', fetchError)
+        } else if (data) {
+          setBusinessName(data.business_name || '')
+          setBusinessType(data.business_type || '')
+          setWebsite(data.website || '')
+          setDescription(data.description || '')
+          if (Array.isArray(data.supporting_files)) {
+            const parsed = data.supporting_files.map((url) => ({
+              url,
+              name: deriveFileName(url)
+            }))
+            setExistingFiles(parsed)
+            setOriginalFiles(parsed)
+          }
+        }
+      } catch (err) {
+        console.warn('Unexpected error loading profile', err)
+      } finally {
+        setInitialLoading(false)
+      }
+    }
+    loadProfile()
+  }, [user])
 
   const uploadFile = async (file, path) => {
     if (!file) return null
@@ -44,7 +124,6 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
     try {
       const uid = user?.id || user?.uid || user?.user_metadata?.sub || null
       if (!uid) throw new Error('Unable to determine user id for upload')
-      const timestamp = Date.now()
       const uploadedUrls = []
 
       // Upload supporting files (if any) and collect URLs
@@ -54,9 +133,26 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
         if (!file.name.toLowerCase().endsWith('.csv')) {
           throw new Error('Only .CSV files are accepted for supporting files.')
         }
-        const path = `users/${uid}/uploads/${timestamp}_${i}_${file.name}`
+        const safeName = encodeURIComponent(file.name)
+        const path = `users/${uid}/uploads/${safeName}`
         const url = await uploadFile(file, path)
         if (url) uploadedUrls.push(url)
+      }
+
+      const existingUrls = existingFiles.map((f) => f.url).filter(Boolean)
+      const allFiles = [...existingUrls, ...uploadedUrls]
+
+      const toDelete = originalFiles
+        .map((f) => f.url)
+        .filter((url) => !existingUrls.includes(url))
+        .map((url) => getStoragePathFromUrl(url))
+        .filter(Boolean)
+
+      if (toDelete.length > 0) {
+        const { error: removeError } = await supabase.storage.from('uploads').remove(toDelete)
+        if (removeError) {
+          console.warn('Error removing files from storage', removeError)
+        }
       }
 
       // Persist profile to Supabase 'profiles' table (upsert by id)
@@ -66,7 +162,7 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
         business_type: businessType || null,
         website: website || null,
         description: description || null,
-        supporting_files: uploadedUrls.length ? uploadedUrls : null,
+        supporting_files: allFiles.length ? allFiles : null,
         profile_complete: true
       }
 
@@ -81,6 +177,14 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (initialLoading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+      </div>
+    )
   }
 
   return (
@@ -146,9 +250,43 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
               <span>Choose files</span>
             </label>
 
+            {existingFiles.length > 0 && (
+              <div className="file-list muted">
+                <strong>Existing:</strong>{' '}
+                {existingFiles.map((file, idx) => (
+                  <span key={file.url} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    {file.name}
+                    <button
+                      type="button"
+                      className="text-button"
+                      onClick={() => setExistingFiles((prev) => prev.filter((f) => f.url !== file.url))}
+                      aria-label={`Remove ${file.name}`}
+                    >
+                      Remove
+                    </button>
+                    {idx < existingFiles.length - 1 ? ',' : ''}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {supportingFiles.length > 0 && (
               <div className="file-list muted">
-                <strong>Selected:</strong> {supportingFiles.map(f => f.name).join(', ')}
+                <strong>Selected:</strong>{' '}
+                {supportingFiles.map((f, idx) => (
+                  <span key={`${f.name}-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    {f.name}
+                    <button
+                      type="button"
+                      className="text-button"
+                      onClick={() => setSupportingFiles((prev) => prev.filter((_, i) => i !== idx))}
+                      aria-label={`Remove ${f.name}`}
+                    >
+                      Remove
+                    </button>
+                    {idx < supportingFiles.length - 1 ? ',' : ''}
+                  </span>
+                ))}
               </div>
             )}
 

@@ -181,8 +181,6 @@ function App() {
                 <div className="loading-container">
                   <div className="loading-spinner"></div>
                 </div>
-              ) : profileComplete ? (
-                <Navigate to="/overview" replace />
               ) : (
                 <ProfilePage 
                   user={user} 
@@ -220,7 +218,16 @@ function App() {
         </Route>
 
         {/* Redirect any unknown routes */}
-        <Route path="*" element={<Navigate to={user ? "/overview" : "/"} replace />} />
+        <Route 
+          path="*" 
+          element={
+            user ? (
+              profileComplete ? <Navigate to="/overview" replace /> : <Navigate to="/profile" replace />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          } 
+        />
       </Routes>
     </BrowserRouter>
   )
