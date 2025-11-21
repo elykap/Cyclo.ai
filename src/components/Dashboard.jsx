@@ -32,7 +32,7 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'overview': return 'Overview'
       case 'inventory': return 'Inventory'
       case 'messaging': return 'Messaging'
-      case 'demographics': return 'Demographics'
+      case 'demographics': return 'Suggestions'
       case 'settings': return 'Settings'
       case 'predicthq-test': return 'PredictHQ API Test'
       default: return 'Dashboard'
@@ -44,7 +44,7 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'overview': return 'Welcome back! Here\'s your overview.'
       case 'inventory': return 'Manage your inventory and track stock levels.'
       case 'messaging': return 'Communicate with your customers.'
-      case 'demographics': return 'View demographic forecasts and upcoming events.'
+      case 'demographics': return 'Get analysis-based suggestions from your customer data.'
       case 'settings': return 'Configure your account and preferences.'
       case 'predicthq-test': return 'Test the PredictHQ Events Intelligence API integration.'
       default: return ''
@@ -104,17 +104,7 @@ function Dashboard({ user, theme, toggleTheme }) {
               <line x1="6" y1="21" x2="6" y2="12"></line>
               <line x1="9" y1="21" x2="9" y2="18"></line>
             </svg>
-            <span className="nav-label">Demographics</span>
-          </Link>
-          <Link 
-            to="/settings"
-            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-          >
-            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 18.364m12.728 0l-4.243-4.243m-4.242 0L5.636 5.636"></path>
-            </svg>
-            <span className="nav-label">Settings</span>
+            <span className="nav-label">Suggestions</span>
           </Link>
           <Link 
             to="/predicthq-test"
@@ -127,6 +117,19 @@ function Dashboard({ user, theme, toggleTheme }) {
             <span className="nav-label">PredictHQ Test</span>
           </Link>
         </nav>
+
+        <div className="sidebar-footer">
+          <Link 
+            to="/settings"
+            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 18.364m12.728 0l-4.243-4.243m-4.242 0L5.636 5.636"></path>
+            </svg>
+            <span className="nav-label">Settings</span>
+          </Link>
+        </div>
       </aside>
 
       {/* Main Content */}
