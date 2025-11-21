@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
+import { parseCSV, readCSVFile } from './utils/csvParser'
 
 function ProfilePage({ user, onComplete, theme, toggleTheme }) {
   const navigate = useNavigate()
@@ -14,13 +15,14 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
   const [initialLoading, setInitialLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [parseStatus, setParseStatus] = useState('')
 
   const deriveFileName = (url) => {
     try {
       const pathname = new URL(url).pathname
       const parts = pathname.split('/')
       return decodeURIComponent(parts[parts.length - 1]) || url
-    } catch (err) {
+    } catch {
       const parts = url.split('/')
       return decodeURIComponent(parts[parts.length - 1] || url)
     }
@@ -43,7 +45,7 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
       }
       // Fallback: remove leading slash from pathname
       return decodeURIComponent(parsed.pathname.replace(/^\//, ''))
-    } catch (err) {
+    } catch {
       // Last resort, strip query and host manually
       const noQuery = url.split('?')[0]
       const parts = noQuery.split('/uploads/')
@@ -95,7 +97,7 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
   const uploadFile = async (file, path) => {
     if (!file) return null
     try {
-      const { data, error } = await supabase.storage.from('uploads').upload(path, file, { upsert: true })
+      const { error } = await supabase.storage.from('uploads').upload(path, file, { upsert: true })
       if (error) throw error
       // Get public URL (requires bucket public or will return a URL depending on settings)
       const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(path)
@@ -125,14 +127,64 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
       const uid = user?.id || user?.uid || user?.user_metadata?.sub || null
       if (!uid) throw new Error('Unable to determine user id for upload')
       const uploadedUrls = []
+      let totalRowsParsed = 0
 
-      // Upload supporting files (if any) and collect URLs
+      // Process and upload supporting files (if any) and collect URLs
       for (let i = 0; i < supportingFiles.length; i++) {
         const file = supportingFiles[i]
         // Ensure CSV by file extension (basic client-side check)
         if (!file.name.toLowerCase().endsWith('.csv')) {
           throw new Error('Only .CSV files are accepted for supporting files.')
         }
+
+        // Parse CSV and insert into database
+        setParseStatus(`Parsing ${file.name}...`)
+        try {
+          const csvText = await readCSVFile(file)
+          const parsedRows = parseCSV(csvText, { hasHeaders: true })
+          
+          if (parsedRows.length > 0) {
+            setParseStatus(`Inserting ${parsedRows.length} transactions from ${file.name}...`)
+            
+            // Prepare data for insertion
+            const transactions = parsedRows.map(row => ({
+              user_id: uid,
+              product_id: row.product_id || null,
+              product_name: row.product_name || null,
+              price: row.price || null,
+              amount: row.amount || null,
+              customer_id: row.customer_id || null,
+              date: row.date || null,
+              source_file: file.name
+            }))
+
+            // Insert in batches to avoid overwhelming the database
+            const batchSize = 100
+            for (let j = 0; j < transactions.length; j += batchSize) {
+              const batch = transactions.slice(j, j + batchSize)
+              const { error: insertError } = await supabase
+                .from('pos_transactions')
+                .insert(batch)
+              
+              if (insertError) {
+                console.error(`Error inserting batch from ${file.name}:`, insertError)
+                // Continue with other files even if one fails
+                throw new Error(`Failed to import data from ${file.name}: ${insertError.message}`)
+              }
+            }
+            
+            totalRowsParsed += parsedRows.length
+            setParseStatus(`Successfully imported ${parsedRows.length} transactions from ${file.name}`)
+          } else {
+            setParseStatus(`No valid data found in ${file.name}`)
+          }
+        } catch (parseError) {
+          console.error(`Error parsing ${file.name}:`, parseError)
+          throw new Error(`Failed to parse ${file.name}: ${parseError.message}`)
+        }
+
+        // Upload file to storage
+        setParseStatus(`Uploading ${file.name}...`)
         const safeName = encodeURIComponent(file.name)
         const path = `users/${uid}/uploads/${safeName}`
         const url = await uploadFile(file, path)
@@ -166,8 +218,18 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
         profile_complete: true
       }
 
-      const { data: upserted, error: upsertError } = await supabase.from('profiles').upsert(profileRecord)
+      setParseStatus('Saving profile...')
+      const { error: upsertError } = await supabase.from('profiles').upsert(profileRecord)
       if (upsertError) throw upsertError
+
+      if (totalRowsParsed > 0) {
+        setParseStatus(`Profile saved! Successfully imported ${totalRowsParsed} transaction${totalRowsParsed !== 1 ? 's' : ''} from CSV files.`)
+      } else {
+        setParseStatus('Profile saved!')
+      }
+
+      // Small delay to show success message
+      await new Promise(resolve => setTimeout(resolve, 1500))
 
       if (onComplete) onComplete()
       navigate('/overview')
@@ -294,6 +356,11 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
           </div>
 
           {error && <div className="error-message">{error}</div>}
+          {parseStatus && !error && (
+            <div className="muted" style={{ marginTop: '10px', fontStyle: 'italic' }}>
+              {parseStatus}
+            </div>
+          )}
 
           <div className="form-actions">
             <button type="submit" className="auth-submit-button" disabled={loading}>{loading ? 'Saving...' : 'Save and Continue'}</button>
