@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from './firebase'
 import LandingPage from './LandingPage'
+import Messaging from './components/Messaging'
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -442,13 +443,8 @@ function App() {
         {/* Messaging Section */}
         {activeTab === 'messaging' && (
           <div className="section-content">
-            <div className="content-card">
-              <div className="card-header">
-                <h3>Customer Messaging</h3>
-              </div>
-              <div className="section-placeholder">
-                <p>Customer messaging and communication features will be displayed here.</p>
-              </div>
+            <div className="content-card messaging-card">
+              <Messaging />
             </div>
           </div>
         )}
