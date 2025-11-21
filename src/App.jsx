@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from './firebase'
 import LandingPage from './LandingPage'
+import ProfilePage from './ProfilePage'
 import Dashboard from './components/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import Overview from './pages/Overview'
@@ -11,6 +10,7 @@ import MessagingPage from './pages/MessagingPage'
 import Demographics from './pages/Demographics'
 import Settings from './pages/Settings'
 import PredictHQTest from './pages/PredictHQTest'
+import { supabase } from './supabaseClient'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -29,14 +29,36 @@ function App() {
     return 'light'
   })
 
-  // Check authentication state
+  // Supabase auth: listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-      setLoading(false)
+    let mounted = true
+    const init = async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        const session = data.session
+        if (session?.user && mounted) {
+          setUser(session.user)
+        }
+      } catch (err) {
+        console.warn('Error getting supabase session', err)
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    init()
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user)
+      } else {
+        setUser(null)
+      }
     })
 
-    return () => unsubscribe()
+    return () => {
+      mounted = false
+      listener?.subscription?.unsubscribe?.()
+    }
   }, [])
 
   useEffect(() => {
@@ -71,7 +93,6 @@ function App() {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
   }
 
-
   // Show loading state
   if (loading) {
     return (
@@ -98,6 +119,20 @@ function App() {
               />
             )
           } 
+        />
+
+        {/* Profile Page - check if profile is complete */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute user={user} loading={loading}>
+              <ProfilePage 
+                user={user} 
+                theme={theme} 
+                toggleTheme={toggleTheme} 
+              />
+            </ProtectedRoute>
+          }
         />
 
         {/* Protected Dashboard Routes */}

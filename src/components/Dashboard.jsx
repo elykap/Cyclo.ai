@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { signOut } from 'firebase/auth'
-import { auth } from '../firebase'
 import { Outlet } from 'react-router-dom'
+import { supabase } from '../supabaseClient'
 
 function Dashboard({ user, theme, toggleTheme }) {
   const location = useLocation()
@@ -21,7 +20,7 @@ function Dashboard({ user, theme, toggleTheme }) {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth)
+      await supabase.auth.signOut()
       navigate('/')
     } catch (error) {
       console.error('Error signing out:', error)

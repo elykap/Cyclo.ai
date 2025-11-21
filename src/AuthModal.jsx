@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
-import { auth } from './firebase'
+import { supabase } from './supabaseClient'
 
 function AuthModal({ isOpen, onClose, onSuccess }) {
   const [isLogin, setIsLogin] = useState(true)
@@ -16,18 +15,20 @@ function AuthModal({ isOpen, onClose, onSuccess }) {
 
     try {
       if (isLogin) {
-        // Sign in
-        await signInWithEmailAndPassword(auth, email, password)
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
       } else {
-        // Sign up
-        await createUserWithEmailAndPassword(auth, email, password)
+        // sign up
+        const { data, error } = await supabase.auth.signUp({ email, password })
+        if (error) throw error
       }
+
       onSuccess()
       onClose()
       setEmail('')
       setPassword('')
     } catch (err) {
-      setError(err.message)
+      setError(err.message || 'Authentication error')
     } finally {
       setLoading(false)
     }
