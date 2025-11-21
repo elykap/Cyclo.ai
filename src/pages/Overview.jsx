@@ -73,9 +73,9 @@ function Overview() {
       to: '/inventory'
     },
     {
-      title: 'Demographics',
-      description: 'Preview upcoming events and local trends that impact your foot traffic.',
-      action: 'View Demographics',
+      title: 'Suggestions',
+      description: 'Analysis-based recommendations generated from your customer data.',
+      action: 'View Suggestions',
       icon: (
         <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
