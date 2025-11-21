@@ -134,16 +134,6 @@ function Dashboard({ user, theme, toggleTheme }) {
             <span className="nav-label">Community</span>
           </Link>
           <Link 
-            to="/settings"
-            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-          >
-            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 18.364m12.728 0l-4.243-4.243m-4.242 0L5.636 5.636"></path>
-            </svg>
-            <span className="nav-label">Settings</span>
-          </Link>
-          <Link 
             to="/predicthq-test"
             className={`nav-item ${activeTab === 'predicthq-test' ? 'active' : ''}`}
           >
@@ -154,13 +144,38 @@ function Dashboard({ user, theme, toggleTheme }) {
             <span className="nav-label">PredictHQ Test</span>
           </Link>
         </nav>
+
+        <div className="sidebar-footer">
+          <Link 
+            to="/settings"
+            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 18.364m12.728 0l-4.243-4.243m-4.242 0L5.636 5.636"></path>
+            </svg>
+            <span className="nav-label">Settings</span>
+          </Link>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="main-content">
+      <main className={`main-content ${activeTab}`}>
         {/* Header */}
         <header className="dashboard-header">
           <div className="header-left">
+            {activeTab !== 'overview' && (
+              <button
+                className="icon-button back-button"
+                onClick={() => navigate('/overview')}
+                title="Back to overview"
+                aria-label="Back to overview"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+            )}
             <h2>{getPageTitle()}</h2>
             <p className="header-subtitle">{getPageSubtitle()}</p>
           </div>

@@ -161,7 +161,7 @@ function Messaging({ user }) {
           <p className="messaging-subtitle">
             {useRAG && user?.id 
               ? 'Ask questions and get personalized responses based on your documents' 
-              : 'Ask questions and get intelligent responses'}
+              : 'Chat with a personalized agent trained on your business data'}
           </p>
           {user?.id && (
             <label className="rag-toggle" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', fontSize: '0.875rem' }}>
@@ -300,4 +300,3 @@ function Messaging({ user }) {
 }
 
 export default Messaging
-

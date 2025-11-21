@@ -355,7 +355,7 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
 
   return (
     <div className="profile-page">
-      <header className="landing-header">
+      <header className="landing-header profile-header">
         <div className="landing-header-content">
           <h1 className="landing-logo">Cyclo</h1>
           <div className="landing-header-actions">
@@ -366,233 +366,250 @@ function ProfilePage({ user, onComplete, theme, toggleTheme }) {
         </div>
       </header>
 
-      <main className="profile-form-container">
-        <h2>Help us get to know you better</h2>
-        <p className="muted">This information helps the agent analyze your data and provide tailored recommendations.</p>
-
-        <form className="profile-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Business Name <span style={{color: 'var(--accent, #e11)'}}>*</span></label>
-            <input value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g., Main Street Books" aria-required="true" />
-          </div>
-
-          <div className="form-group">
-            <label>Business Type <span style={{color: 'var(--accent, #e11)'}}>*</span></label>
-            <input value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder="e.g., Independent bookstore, Coffee shop, Grocery" aria-required="true" />
-            <small className="muted">Free-form text: describe your business (used to build your profile)</small>
-          </div>
-
-          <div className="form-group">
-            <label>Website (optional)</label>
-            <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" />
-          </div>
-
-          <div className="form-group">
-            <label>Short description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of your business and goals"></textarea>
-          </div>
-
-          <div className="form-group">
-            <label>Documents for AI context (PDF, TXT, MD, CSV)</label>
-            <p className="muted" style={{ fontSize: '0.875rem', marginBottom: '8px' }}>
-              Upload documents that the AI can reference when answering your questions. These will be processed and stored for personalized responses.
-            </p>
-
-            <input
-              id="document-files-input"
-              type="file"
-              accept=".pdf,.txt,.md,.markdown,.csv"
-              multiple
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const list = e.target.files ? Array.from(e.target.files) : []
-                setDocumentFiles(list)
-              }}
-            />
-
-            <label htmlFor="document-files-input" className="file-upload-button auth-submit-button" role="button" style={{ marginBottom: '8px' }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
+      <main className="profile-shell">
+        <div className="section-content profile-content">
+          <div className="profile-back-row">
+            <button
+              className="icon-button back-button"
+              onClick={() => navigate('/overview')}
+              title="Back to overview"
+              aria-label="Back to overview"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
-              <span>Choose documents</span>
-            </label>
-
-            {documentFiles.length > 0 && (
-              <div className="file-list muted" style={{ marginTop: '8px' }}>
-                <strong>Selected:</strong>{' '}
-                {documentFiles.map((f, idx) => (
-                  <span key={`doc-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    {f.name}
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() => setDocumentFiles((prev) => prev.filter((_, i) => i !== idx))}
-                      aria-label={`Remove ${f.name}`}
-                    >
-                      Remove
-                    </button>
-                    {idx < documentFiles.length - 1 ? ',' : ''}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {documentUploadStatus && (
-              <div className="muted" style={{ marginTop: '8px', fontStyle: 'italic', fontSize: '0.875rem' }}>
-                {documentUploadStatus}
-              </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label>Inventory Data Files (.CSV only)</label>
-            <p className="muted" style={{ fontSize: '0.875rem', marginBottom: '8px' }}>
-              Upload CSV files containing your inventory data (product_name, product_id, total_sales). These will be imported for AI-powered product recommendations.
-            </p>
-
-            <input
-              id="inventory-files-input"
-              type="file"
-              accept=".csv"
-              multiple
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const list = e.target.files ? Array.from(e.target.files) : []
-                setInventoryFiles(list)
-              }}
-            />
-
-            <label htmlFor="inventory-files-input" className="file-upload-button auth-submit-button" role="button" style={{ marginBottom: '8px' }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-              <span>Choose inventory CSV files</span>
-            </label>
-
-            {inventoryFiles.length > 0 && (
-              <div className="file-list muted" style={{ marginTop: '8px' }}>
-                <strong>Selected:</strong>{' '}
-                {inventoryFiles.map((f, idx) => (
-                  <span key={`inv-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    {f.name}
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() => setInventoryFiles((prev) => prev.filter((_, i) => i !== idx))}
-                      aria-label={`Remove ${f.name}`}
-                    >
-                      Remove
-                    </button>
-                    {idx < inventoryFiles.length - 1 ? ',' : ''}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {inventoryUploadStatus && (
-              <div className="muted" style={{ marginTop: '8px', fontStyle: 'italic', fontSize: '0.875rem' }}>
-                {inventoryUploadStatus}
-              </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label>POS Data Files (.CSV only)</label>
-            <p className="muted" style={{ fontSize: '0.875rem', marginBottom: '8px' }}>
-              Upload CSV files containing your point-of-sale transaction data. These will be imported into the database for analysis.
-            </p>
-
-            <input
-              id="supporting-files-input"
-              type="file"
-              accept=".csv,text/csv"
-              multiple
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const list = e.target.files ? Array.from(e.target.files) : []
-                setSupportingFiles(list)
-              }}
-            />
-
-            <label htmlFor="supporting-files-input" className="file-upload-button auth-submit-button" role="button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M20 15a4 4 0 0 0-4-4h-1.26A4 4 0 1 0 9 17" />
-                <path d="M16 16v6" />
-                <path d="M12 20h8" />
-              </svg>
-              <span>Choose files</span>
-            </label>
-
-            {existingFiles.length > 0 && (
-              <div className="file-list muted">
-                <strong>Existing:</strong>{' '}
-                {existingFiles.map((file, idx) => (
-                  <span key={file.url} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    {file.name}
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() => setExistingFiles((prev) => prev.filter((f) => f.url !== file.url))}
-                      aria-label={`Remove ${file.name}`}
-                    >
-                      Remove
-                    </button>
-                    {idx < existingFiles.length - 1 ? ',' : ''}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {supportingFiles.length > 0 && (
-              <div className="file-list muted">
-                <strong>Selected:</strong>{' '}
-                {supportingFiles.map((f, idx) => (
-                  <span key={`${f.name}-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    {f.name}
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() => setSupportingFiles((prev) => prev.filter((_, i) => i !== idx))}
-                      aria-label={`Remove ${f.name}`}
-                    >
-                      Remove
-                    </button>
-                    {idx < supportingFiles.length - 1 ? ',' : ''}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <small className="muted">Upload CSV export(s) from your POS or inventory system to help analysis.</small>
-          </div>
-
-          {error && <div className="error-message">{error}</div>}
-          {parseStatus && !error && (
-            <div className="muted" style={{ marginTop: '10px', fontStyle: 'italic' }}>
-              {parseStatus}
-            </div>
-          )}
-
-          {documentUploadStatus && !error && (
-            <div className="muted" style={{ marginTop: '10px', fontStyle: 'italic', fontSize: '0.875rem' }}>
-              {documentUploadStatus}
-            </div>
-          )}
-
-          <div className="form-actions">
-            <button type="submit" className="auth-submit-button" disabled={loading || uploadingDocuments}>
-              {uploadingDocuments ? 'Processing documents...' : loading ? 'Saving...' : 'Save and Continue'}
             </button>
           </div>
-        </form>
+          <div className="content-card profile-card">
+            <div className="card-header">
+              <div>
+                <p className="eyebrow muted">Profile setup</p>
+                <h2>Help us get to know you better</h2>
+                <p className="muted">This information helps the agent analyze your data and provide tailored recommendations.</p>
+              </div>
+            </div>
+
+            <form className="profile-form" onSubmit={handleSubmit}>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Business Name <span style={{color: 'var(--accent, #e11)'}}>*</span></label>
+                  <input value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g., Main Street Books" aria-required="true" />
+                </div>
+
+                <div className="form-group">
+                  <label>Business Type <span style={{color: 'var(--accent, #e11)'}}>*</span></label>
+                  <input value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder="e.g., Independent bookstore, Coffee shop, Grocery" aria-required="true" />
+                  <small className="muted">Free-form text: describe your business (used to build your profile)</small>
+                </div>
+
+                <div className="form-group">
+                  <label>Website (optional)</label>
+                  <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" />
+                </div>
+
+                <div className="form-group">
+                  <label>Short description</label>
+                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of your business and goals"></textarea>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Documents for AI context (PDF, TXT, MD, CSV)</label>
+                <p className="muted" style={{ fontSize: '0.875rem', marginBottom: '8px' }}>
+                  Upload documents that the AI can reference when answering your questions. These will be processed and stored for personalized responses.
+                </p>
+
+                <input
+                  id="document-files-input"
+                  type="file"
+                  accept=".pdf,.txt,.md,.markdown,.csv"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const list = e.target.files ? Array.from(e.target.files) : []
+                    setDocumentFiles(list)
+                  }}
+                />
+
+                <label htmlFor="document-files-input" className="file-upload-button auth-submit-button" role="button" style={{ marginBottom: '8px' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  <span>Choose documents</span>
+                </label>
+
+                {documentFiles.length > 0 && (
+                  <div className="file-list muted" style={{ marginTop: '8px' }}>
+                    <strong>Selected:</strong>{' '}
+                    {documentFiles.map((f, idx) => (
+                      <span key={`doc-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        {f.name}
+                        <button
+                          type="button"
+                          className="text-button"
+                          onClick={() => setDocumentFiles((prev) => prev.filter((_, i) => i !== idx))}
+                          aria-label={`Remove ${f.name}`}
+                        >
+                          Remove
+                        </button>
+                        {idx < documentFiles.length - 1 ? ',' : ''}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {documentUploadStatus && (
+                  <div className="muted" style={{ marginTop: '8px', fontStyle: 'italic', fontSize: '0.875rem' }}>
+                    {documentUploadStatus}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Inventory Data Files (.CSV only)</label>
+                <p className="muted" style={{ fontSize: '0.875rem', marginBottom: '8px' }}>
+                  Upload CSV files containing your inventory data (product_name, product_id, total_sales). These will be imported for AI-powered product recommendations.
+                </p>
+
+                <input
+                  id="inventory-files-input"
+                  type="file"
+                  accept=".csv"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const list = e.target.files ? Array.from(e.target.files) : []
+                    setInventoryFiles(list)
+                  }}
+                />
+
+                <label htmlFor="inventory-files-input" className="file-upload-button auth-submit-button" role="button" style={{ marginBottom: '8px' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  <span>Choose inventory CSV files</span>
+                </label>
+
+                {inventoryFiles.length > 0 && (
+                  <div className="file-list muted" style={{ marginTop: '8px' }}>
+                    <strong>Selected:</strong>{' '}
+                    {inventoryFiles.map((f, idx) => (
+                      <span key={`inv-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        {f.name}
+                        <button
+                          type="button"
+                          className="text-button"
+                          onClick={() => setInventoryFiles((prev) => prev.filter((_, i) => i !== idx))}
+                          aria-label={`Remove ${f.name}`}
+                        >
+                          Remove
+                        </button>
+                        {idx < inventoryFiles.length - 1 ? ',' : ''}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {inventoryUploadStatus && (
+                  <div className="muted" style={{ marginTop: '8px', fontStyle: 'italic', fontSize: '0.875rem' }}>
+                    {inventoryUploadStatus}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>POS Data Files (.CSV only)</label>
+                <p className="muted" style={{ fontSize: '0.875rem', marginBottom: '8px' }}>
+                  Upload CSV files containing your point-of-sale transaction data. These will be imported into the database for analysis.
+                </p>
+
+                <input
+                  id="supporting-files-input"
+                  type="file"
+                  accept=".csv,text/csv"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const list = e.target.files ? Array.from(e.target.files) : []
+                    setSupportingFiles(list)
+                  }}
+                />
+
+                <label htmlFor="supporting-files-input" className="file-upload-button auth-submit-button" role="button">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M20 15a4 4 0 0 0-4-4h-1.26A4 4 0 1 0 9 17" />
+                    <path d="M16 16v6" />
+                    <path d="M12 20h8" />
+                  </svg>
+                  <span>Choose files</span>
+                </label>
+
+                {existingFiles.length > 0 && (
+                  <div className="file-list muted">
+                    <strong>Existing:</strong>{' '}
+                    {existingFiles.map((file, idx) => (
+                      <span key={file.url} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        {file.name}
+                        <button
+                          type="button"
+                          className="text-button"
+                          onClick={() => setExistingFiles((prev) => prev.filter((f) => f.url !== file.url))}
+                          aria-label={`Remove ${file.name}`}
+                        >
+                          Remove
+                        </button>
+                        {idx < existingFiles.length - 1 ? ',' : ''}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {supportingFiles.length > 0 && (
+                  <div className="file-list muted">
+                    <strong>Selected:</strong>{' '}
+                    {supportingFiles.map((f, idx) => (
+                      <span key={`${f.name}-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        {f.name}
+                        <button
+                          type="button"
+                          className="text-button"
+                          onClick={() => setSupportingFiles((prev) => prev.filter((_, i) => i !== idx))}
+                          aria-label={`Remove ${f.name}`}
+                        >
+                          Remove
+                        </button>
+                        {idx < supportingFiles.length - 1 ? ',' : ''}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <small className="muted">Upload CSV export(s) from your POS or inventory system to help analysis.</small>
+              </div>
+
+              {error && <div className="error-message">{error}</div>}
+              {(parseStatus || documentUploadStatus || inventoryUploadStatus) && !error && (
+                <div className="muted" style={{ marginTop: '10px', fontStyle: 'italic' }}>
+                  {parseStatus || documentUploadStatus || inventoryUploadStatus}
+                </div>
+              )}
+
+              <div className="form-actions">
+                <button type="submit" className="auth-submit-button" disabled={loading || uploadingDocuments}>
+                  {uploadingDocuments ? 'Processing documents...' : loading ? 'Saving...' : 'Save and Continue'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </main>
     </div>
   )

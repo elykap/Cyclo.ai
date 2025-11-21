@@ -5,7 +5,7 @@ function MessagingPage() {
   const { user } = useAuth()
   
   return (
-    <div className="section-content">
+    <div className="section-content messaging-page">
       <div className="content-card messaging-card">
         <Messaging user={user} />
       </div>
@@ -14,4 +14,3 @@ function MessagingPage() {
 }
 
 export default MessagingPage
-

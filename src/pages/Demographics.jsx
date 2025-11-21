@@ -3,10 +3,10 @@ function Demographics() {
     <div className="section-content">
       <div className="content-card">
         <div className="card-header">
-          <h3>Demographic Forecast</h3>
+          <h3>Suggestions</h3>
         </div>
         <div className="section-placeholder">
-          <p>Demographic forecasting and event analysis features will be displayed here.</p>
+          <p>Analysis-based suggestions from your customer data will be displayed here.</p>
         </div>
       </div>
     </div>
@@ -14,4 +14,3 @@ function Demographics() {
 }
 
 export default Demographics
-
