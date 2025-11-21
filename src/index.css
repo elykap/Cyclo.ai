@@ -113,7 +113,7 @@ body {
 /* Dashboard Layout */
 .dashboard-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background-color: var(--bg-primary);
   transition: background-color 0.3s ease;
 }
@@ -229,6 +229,25 @@ body {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.main-content.messaging {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-bottom: 0;
+}
+
+.main-content.messaging .section-content {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  min-height: 0;
+  height: 100%;
 }
 
 .dashboard-header {
@@ -236,6 +255,13 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-top: 0.5rem;
+  padding-bottom: 1rem;
+  background: var(--bg-primary);
+  backdrop-filter: blur(4px);
 }
 
 .header-left h2 {
@@ -248,6 +274,15 @@ body {
   color: var(--text-secondary);
   margin: 0;
   font-size: 0.95rem;
+}
+
+.back-button {
+  margin-right: 0.75rem;
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
 }
 
 .header-right {
@@ -416,6 +451,7 @@ body {
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: var(--shadow-md);
+  transition: transform 0.18s ease, box-shadow 0.25s ease, border-color 0.2s ease;
 }
 
 .card-header {
@@ -454,6 +490,38 @@ body {
 
 .text-button:hover {
   text-decoration: underline;
+}
+
+.preview-card {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+}
+
+.preview-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+}
+
+.preview-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-action-hover);
+}
+
+.preview-card:hover::after {
+  transform: translateX(100%);
+}
+
+.preview-card:active {
+  transform: translateY(-2px) scale(0.99);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Chart */
@@ -580,11 +648,45 @@ body {
   width: 100%;
 }
 
+.messaging-page {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
 .section-placeholder {
   padding: 3rem 2rem;
   text-align: center;
   color: var(--text-secondary);
   font-size: 1.1rem;
+}
+
+.subscription-status {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  background: var(--bg-tertiary);
+}
+
+.subscription-status h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.feature-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+  color: var(--text-primary);
+  display: grid;
+  gap: 0.35rem;
+}
+
+.feature-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Auth Modal */
@@ -1165,10 +1267,18 @@ input[type="file"][id^="supporting-files-input"] {
 /* Messaging Component Styles */
 .messaging-card {
   padding: 0;
-  height: calc(100vh - 200px);
-  min-height: 600px;
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.main-content.messaging .messaging-card {
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  flex: 1;
   overflow: hidden;
 }
 
