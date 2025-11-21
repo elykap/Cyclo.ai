@@ -146,7 +146,7 @@ function Messaging({ user }) {
       {
         id: 1,
         role: 'assistant',
-        content: 'Hello! I\'m your Watson AI assistant. How can I help you today?',
+        content: 'Hello! I\'m your personalized assistant. How can I help you today?',
         timestamp: new Date()
       }
     ])
@@ -157,11 +157,11 @@ function Messaging({ user }) {
     <div className="messaging-container">
       <div className="messaging-header">
         <div className="messaging-header-content">
-          <h3>Watson AI Assistant</h3>
+          <h3>Cyclo Consultant</h3>
           <p className="messaging-subtitle">
             {useRAG && user?.id 
               ? 'Ask questions and get personalized responses based on your documents' 
-              : 'Chat with a personalized agent trained on your business data'}
+              : 'Voice your questions here to a personalized agent trained on your business data'}
           </p>
           {user?.id && (
             <label className="rag-toggle" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', fontSize: '0.875rem' }}>

@@ -230,7 +230,7 @@ function App() {
           <Route path="demographics" element={<Demographics />} />
           <Route path="community" element={<Community />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="predicthq-test" element={<PredictHQTest />} />
+          <Route path="events" element={<PredictHQTest />} />
         </Route>
 
         {/* Redirect any unknown routes */}

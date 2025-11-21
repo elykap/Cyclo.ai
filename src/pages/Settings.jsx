@@ -21,7 +21,7 @@ function Settings() {
           <h4>Subscription</h4>
           <p className="muted">Current plan: <strong>Premium</strong></p>
           <ul className="feature-checklist">
-            <li>✓ Messaging access</li>
+            <li>✓ Cyclo Bot access</li>
             <li>✓ Demographics access</li>
             <li>✓ Inventory access</li>
           </ul>

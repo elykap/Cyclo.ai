@@ -32,11 +32,11 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'overview': return 'Overview'
       case 'inventory': return 'Inventory'
       case 'recommendations': return 'Recommendations'
-      case 'messaging': return 'Messaging'
+      case 'messaging': return 'Cyclo Bot'
       case 'demographics': return 'Demographics'
       case 'community': return 'Community'
       case 'settings': return 'Settings'
-      case 'predicthq-test': return 'PredictHQ API Test'
+      case 'events': return 'Upcoming Events'
       default: return 'Dashboard'
     }
   }
@@ -46,11 +46,11 @@ function Dashboard({ user, theme, toggleTheme }) {
       case 'overview': return 'Welcome back! Here\'s your overview.'
       case 'inventory': return 'Manage your inventory and track stock levels.'
       case 'recommendations': return 'AI-powered product recommendations and insights.'
-      case 'messaging': return 'Communicate with your customers.'
+      case 'messaging': return 'Chat with a personalized agent trained on your data.'
       case 'demographics': return 'View demographic forecasts and upcoming events.'
       case 'community': return 'Connect with other users, share questions and insights.'
       case 'settings': return 'Configure your account and preferences.'
-      case 'predicthq-test': return 'Test the PredictHQ Events Intelligence API integration.'
+      case 'events': return 'Automatically pulling nearby upcoming events for planning.'
       default: return ''
     }
   }
@@ -106,7 +106,7 @@ function Dashboard({ user, theme, toggleTheme }) {
             <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            <span className="nav-label">Messaging</span>
+            <span className="nav-label">Cyclo Bot</span>
           </Link>
           <Link 
             to="/demographics"
@@ -134,14 +134,14 @@ function Dashboard({ user, theme, toggleTheme }) {
             <span className="nav-label">Community</span>
           </Link>
           <Link 
-            to="/predicthq-test"
-            className={`nav-item ${activeTab === 'predicthq-test' ? 'active' : ''}`}
+            to="/events"
+            className={`nav-item ${activeTab === 'events' ? 'active' : ''}`}
           >
             <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
-            <span className="nav-label">PredictHQ Test</span>
+            <span className="nav-label">Upcoming Events</span>
           </Link>
         </nav>
 
