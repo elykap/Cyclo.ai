@@ -1,234 +1,220 @@
-# Cyclo.ai – IBM watsonx.ai Integration
+# Cyclo.ai - AI-Powered Business Intelligence Platform
 
-Cyclo.ai already has its own product experience, so this repository focuses on the **shared LLM infrastructure** only.  
-You get a production-ready IBM watsonx.ai service + proxy that any page, route or API inside Cyclo.ai can consume.
+Cyclo.ai helps small businesses make smarter decisions using AI. Upload your sales data, inventory, and documents, and get personalized insights, recommendations, and answers to your business questions.
 
-## Highlights
+## What Can Cyclo.ai Do For You?
 
-- 🧠 **Central LLM service** (`src/services/watsonxServiceProxy.js`) with helpers for text, chat, embeddings, models and more.
-- 🔐 **Server-side proxy** (`server.js`) handles IAM auth + CORS, so the browser never touches IBM directly.
-- ⚙️ **Config in one place** (`src/config/watsonx.config.js`) for regions, versions and environment variables.
-- 🧩 **UI-free landing page** explaining how to wire the service into any feature—no forced chat/demo pages.
-- ⚡ **Vite + React 19** baseline; ready to drop into any larger monorepo or micro-frontend setup.
+### 📊 **Sales & Inventory Analysis**
+- Upload your sales data (CSV files from your POS system)
+- Track your best-selling products
+- Get alerts for low stock items
+- See sales trends and patterns
 
-## IBM watsonx.ai API Reference
+### 🤖 **AI-Powered Recommendations**
+- Get personalized product recommendations
+- Learn which products to promote with ads
+- Discover which customers to reach out to
+- Receive actionable marketing strategies
 
-This starter uses the official [IBM watsonx.ai API](https://cloud.ibm.com/apidocs/watsonx-ai) and exposes convenient helpers for:
+### 📈 **Business Trends**
+- Analyze your sales data to find opportunities
+- Get ad campaign suggestions for your top products
+- Receive customer outreach recommendations
+- Understand what's working and what's not
 
-- `generateText` / `chatCompletion` / `generateTextStream`
-- `generateEmbeddings`, `tokenize`
-- `listFoundationModels`, `listTrainings`, `createTraining`, etc.
+### 💬 **AI Assistant (Cyclo Bot)**
+- Ask questions about your business
+- Get answers based on your uploaded documents
+- Chat with an AI trained on your business data
+- Get instant insights without searching through files
+
+### 📅 **Upcoming Events Planning**
+- See nearby events that might affect your business
+- Get recommendations for inventory, staffing, and marketing
+- Plan ahead for busy periods
+- Maximize revenue opportunities
 
 ## Getting Started
 
-### Prerequisites
+### Step 1: Sign Up
+1. Open the application in your web browser
+2. Click "Get Started" or "Sign Up"
+3. Create your account with email and password
 
-- Node.js **20.19+** or **22.12+** (matching Vite’s requirement)
+### Step 2: Complete Your Profile
+1. Enter your business name and type
+2. Add a description of your business
+3. Upload your business documents (PDFs, text files) - these help the AI understand your business better
+
+### Step 3: Upload Your Data
+
+**Upload Sales Data:**
+- Go to your Profile page
+- Upload CSV files from your POS system
+- The system will automatically analyze your sales
+
+**Upload Inventory:**
+- Go to the Inventory page
+- Upload your inventory CSV file
+- Track stock levels and sales
+
+### Step 4: Explore Features
+
+**Overview:** See a summary of your business data
+
+**Inventory:** Manage and track your products
+
+**Recommendations:** Get AI-powered suggestions for your business
+
+**Trends:** Analyze sales data and get marketing recommendations
+
+**Cyclo Bot:** Chat with AI about your business
+
+**Upcoming Events:** Plan for nearby events and opportunities
+
+## What You Need
+
+### For Basic Use:
+- A web browser (Chrome, Firefox, Safari, or Edge)
+- An internet connection
+- Your business data (CSV files from your POS system)
+
+### For Advanced Features:
+- Business documents (PDFs, text files) to train the AI
+- Inventory data in CSV format
+- Sales transaction data in CSV format
+
+## Understanding Your Data
+
+### Sales Data Format
+Your CSV file should include columns like:
+- Product name or ID
+- Price
+- Quantity sold
+- Customer ID (optional)
+- Date of sale
+
+The system is flexible and will recognize common column names automatically.
+
+### Inventory Format
+Your CSV file should include:
+- Product name
+- Product ID
+- Total sales (optional)
+- Current stock (optional)
+
+## Features Explained
+
+### AI Recommendations
+The AI analyzes your sales and inventory data to suggest:
+- Which products to promote
+- Which products need restocking
+- Best-selling items to focus on
+- Marketing opportunities
+
+### Trends Analysis
+Get insights on:
+- Your top-selling products
+- Products with growing sales
+- Ad campaign ideas for specific products
+- Customer outreach strategies
+
+### Cyclo Bot
+Ask questions like:
+- "What are my best-selling products?"
+- "Which products are low in stock?"
+- "What should I focus on for marketing?"
+- "Tell me about my sales trends"
+
+The bot uses your uploaded documents and data to give personalized answers.
+
+## Getting Help
+
+### Common Questions
+
+**Q: How do I upload my data?**
+A: Go to your Profile page and use the file upload sections. The system accepts CSV files for sales and inventory data.
+
+**Q: Can I update my data?**
+A: Yes! Just upload new CSV files. The system will update your information.
+
+**Q: Is my data secure?**
+A: Yes, your data is stored securely and only you can access it.
+
+**Q: What if I have questions?**
+A: Use the Cyclo Bot to ask questions, or check the documentation files in the project.
+
+## Technical Setup (For Developers)
+
+If you're setting up the application for development:
+
+### Requirements
+- Node.js 20.19+ or 22.12+
 - IBM Cloud account with watsonx.ai access
-- IBM Cloud API Key
-- watsonx.ai Project ID
+- Supabase account (for database)
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd Cyclo.ai
-   ```
-
-2. **Install dependencies**
+1. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Configure environment variables**
-
-   Create a `.env` file in the root directory (a `.env.example` file is provided as a template):
-
-   ```bash
-   # IBM watsonx.ai Configuration
-   VITE_WATSONX_API_KEY=your_ibm_cloud_api_key_here
-   VITE_WATSONX_PROJECT_ID=your_project_id_here
-   VITE_WATSONX_SPACE_ID=your_space_id_here  # Optional
-   
-   # PredictHQ Events Intelligence API (Optional - for demographics/events features)
-   VITE_PREDICTHQ_API_TOKEN=your_predicthq_api_token_here
+2. **Set up environment variables:**
+   Create a `.env` file with:
+   ```
+   VITE_WATSONX_API_KEY=your_api_key
+   VITE_WATSONX_PROJECT_ID=your_project_id
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_key
+   VITE_PREDICTHQ_API_TOKEN=your_predicthq_token (optional)
    ```
 
-   **How to get your credentials:**
+3. **Set up database:**
+   - Create a Supabase project
+   - Run the migration files in `supabase/migrations/` in order
+   - See individual setup guides for details
 
-   - **IBM Cloud API Key**: Visit [IBM Cloud API Keys](https://cloud.ibm.com/iam/apikeys) and create a new API key
-   - **Project ID**: Found in your watsonx.ai project settings
-   - **Space ID**: (Optional) Found in your deployment space settings
-   - **PredictHQ API Token**: Sign up at [PredictHQ](https://www.predicthq.com/) and get your API token from the dashboard (optional, for events/demographics features)
-
-4. **Start Vite + Proxy together**
+4. **Start the application:**
    ```bash
    npm run dev:proxy
    ```
 
-5. **Open your browser**
-   Vite will print the actual port (5173/5174/5175…). Visit the shown URL.
+### Database Setup
+
+The application requires several database tables. Run these migrations in your Supabase SQL Editor:
+
+1. `001_create_pos_transactions.sql` - For sales data
+2. `002_create_documents_vector_store.sql` - For AI document storage
+3. `003_update_embeddings_variable_dimensions.sql` - For AI embeddings
+4. `004_create_inventory_table.sql` - For inventory data
+
+See the individual documentation files for detailed setup instructions:
+- `POS_DATA_IMPORT.md` - Sales data setup
+- `RAG_SETUP.md` - AI document features setup
+- `CSV_FORMAT.md` - CSV file format guide
 
 ## Project Structure
 
 ```
 Cyclo.ai/
 ├── src/
-│   ├── config/
-│   │   └── watsonx.config.js     # API configuration
-│   ├── services/
-│   │   └── watsonxServiceProxy.js # The shared LLM helper
-│   ├── App.jsx                    # Main application component
-│   ├── index.css                  # Global styles
-│   └── main.jsx                   # Application entry point
-├── server.js                      # Local proxy (IAM + CORS)
-├── .env.example                   # Environment variables template
-├── package.json                   # Project dependencies
-└── README.md                      # This file
+│   ├── pages/          # Main application pages
+│   ├── components/     # Reusable UI components
+│   ├── services/       # Business logic and API services
+│   └── utils/          # Helper functions
+├── supabase/
+│   └── migrations/     # Database setup files
+└── public/             # Static files
 ```
-
-## Using the shared service
-
-Import the service anywhere (pages, hooks, API routes, workers) and call the helper you need:
-
-```ts
-import watsonxService from '@/services/watsonxServiceProxy'
-
-async function summarize(text) {
-  const { results } = await watsonxService.generateText({
-    model_id: 'ibm/granite-3-8b-instruct',
-    input: `Summarise:\n${text}`,
-    parameters: { max_new_tokens: 200, temperature: 0.5 }
-  })
-
-  return results?.[0]?.generated_text ?? ''
-}
-```
-
-Available helpers today:
-
-| Method | Description |
-| --- | --- |
-| `generateText` | Single-shot completion |
-| `generateTextStream` | (Browser-safe) SSE streaming |
-| `chatCompletion` | Multi-turn chat format |
-| `generateEmbeddings` | Vector embeddings |
-| `tokenize` | Token breakdown |
-| `listFoundationModels` | Metadata for available models |
-| `createTraining`, `listTrainings`, `listDeployments` | Advanced lifecycle helpers |
-
-## Available Models
-
-The default model (`ibm/granite-3-8b-instruct`) is configured for the Dallas region.  
-You can switch to any supported model listed in the [IBM catalog](https://www.ibm.com/docs/en/watsonx-as-a-service/latest?topic=models-supported-foundation-ai).
-
-## Configuration
-
-### Changing the Default Region
-
-Edit `src/config/watsonx.config.js` to change the default region:
-
-```javascript
-// Available regions: dallas, frankfurt, london, tokyo, sydney, toronto, mumbai
-defaultRegion: 'dallas'
-```
-
-### Customizing Generation Parameters
-
-Modify parameters in `src/services/watsonxServiceProxy.js`:
-
-```javascript
-parameters: {
-  max_new_tokens: 200,    // Maximum tokens to generate
-  temperature: 0.7,       // Randomness (0.0 - 2.0)
-  top_p: 1,              // Nucleus sampling
-  top_k: 50              // Top-k sampling
-}
-```
-
-## Security Notes
-
-⚠️ **Important**: This is a demo application. In production:
-
-1. **Never expose API keys in client-side code**
-2. Implement a backend proxy to handle IBM Cloud authentication
-3. Use environment variables only for development
-4. Implement proper rate limiting and error handling
-5. Add authentication and authorization to your application
-
-## API Reference
-
-The application uses the following IBM watsonx.ai API endpoints:
-
-- `POST /ml/v1/text/generation` - Generate text
-- `POST /ml/v1/text/chat` - Chat completions
-- `POST /ml/v1/text/embeddings` - Generate embeddings
-- `POST /ml/v1/text/tokenization` - Tokenize text
-- `GET /ml/v1/foundation_model_specs` - List models
-
-For complete API documentation, visit: [IBM watsonx.ai API Documentation](https://cloud.ibm.com/apidocs/watsonx-ai)
-
-## Scripts
-
-- `npm run dev` - Start Vite only (proxy not included)
-- `npm run server` - Start proxy only
-- `npm run dev:proxy` - Start Vite + proxy together (recommended)
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## Technologies Used
-
-- **React 19** - UI framework
-- **Vite** - Build tool and development server
-- **IBM watsonx.ai API** - AI/ML capabilities
-- **CSS3** - Modern styling with gradients and animations
-
-## Troubleshooting
-
-### Authentication Errors
-
-If you see authentication errors:
-1. Verify your API key is correct
-2. Check that your API key has watsonx.ai permissions
-3. Ensure your Project ID is valid
-
-### CORS Issues
-
-If you encounter CORS errors:
-- Ensure you are using `npm run dev:proxy`
-- Confirm the proxy port (default `3002`) matches `watsonxServiceProxy.js`
-
-### Model Not Available
-
-If a model isn't working:
-- Check if the model is available in your region
-- Verify your account has access to the model
-- Try switching to a different model
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Resources
-
-- [IBM watsonx.ai Documentation](https://www.ibm.com/docs/en/watsonx-as-a-service)
-- [IBM watsonx.ai API Docs](https://cloud.ibm.com/apidocs/watsonx-ai)
-- [IBM Cloud](https://cloud.ibm.com)
-- [React Documentation](https://react.dev)
-- [Vite Documentation](https://vitejs.dev)
 
 ## Support
 
-For issues and questions:
-- IBM watsonx.ai: [IBM Support](https://www.ibm.com/mysupport)
-- Project issues: Open an issue on GitHub
+For technical issues or questions:
+- Check the documentation files in the project
+- Review the setup guides for specific features
+- Contact your development team
 
 ---
 
-Built with ❤️ using IBM watsonx.ai
+**Cyclo.ai** - Making business intelligence simple and accessible for everyone.
